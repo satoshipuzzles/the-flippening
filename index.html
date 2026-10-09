@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Flippening</title>
-<meta name="description" content="Bitcoin (XBT) vs ShaT coin (BTC): live market caps, prices, volume and how close XBT is to flipping ShaT coin.">
+<meta name="description" content="Bitcoin (XBT) vs ShaT Coin (BTC): live market caps, prices, volume and how close XBT is to flipping ShaT Coin.">
 <meta name="theme-color" content="#0d1117">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/img/favicon-64.png">
@@ -14,15 +14,15 @@
 <meta name="apple-mobile-web-app-title" content="Flippening">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="The Flippening">
-<meta property="og:title" content="The Flippening: Bitcoin (XBT) vs ShaT coin (BTC)">
-<meta property="og:description" content="Live market caps, prices and volume. How close is XBT to flipping ShaT coin?">
+<meta property="og:title" content="The Flippening: Bitcoin (XBT) vs ShaT Coin (BTC)">
+<meta property="og:description" content="Live market caps, prices and volume. How close is XBT to flipping ShaT Coin?">
 <meta property="og:url" content="https://the-flippening.vercel.app/">
 <meta property="og:image" content="https://the-flippening.vercel.app/api/og">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="The Flippening: Bitcoin (XBT) vs ShaT coin (BTC)">
-<meta name="twitter:description" content="Live market caps, prices and volume. How close is XBT to flipping ShaT coin?">
+<meta name="twitter:title" content="The Flippening: Bitcoin (XBT) vs ShaT Coin (BTC)">
+<meta name="twitter:description" content="Live market caps, prices and volume. How close is XBT to flipping ShaT Coin?">
 <meta name="twitter:image" content="https://the-flippening.vercel.app/api/og">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -48,7 +48,7 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 48px; padding-top: env(safe-area-inset-top); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
 header { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 12px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
 .brand img { width: 32px; height: 32px; }
@@ -62,6 +62,7 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .up { color: var(--up); } .down { color: var(--down); }
 .small { font-size: 12px; color: var(--muted); }
 .teth { width: 15px; height: 15px; vertical-align: -3px; margin-left: 3px; }
+img.tT { height: 0.86em; width: auto; vertical-align: -0.06em; margin: 0 0.04em 0 0.02em; }
 .btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 600 14px Inter, sans-serif; padding: 9px 14px; border-radius: 9px; cursor: pointer; text-decoration: none; }
 .btn.gold { background: var(--xbt); border-color: var(--xbt); color: #1a1405; }
 
@@ -86,7 +87,7 @@ header { flex-wrap: wrap; }
 .rankbar .big { font-size: clamp(22px, 4vw, 30px); font-weight: 800; letter-spacing: -0.02em; }
 .rankbar .big b { color: var(--xbt); }
 .toptools { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 6px; }
-.toptools input { flex: 1; min-width: 180px; font: 500 15px Inter, sans-serif; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.toptools input { flex: 1; min-width: 180px; font: 500 16px Inter, sans-serif; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
 .top100 { min-width: 1080px; }
 .top100 th, .top100 td { padding: 12px 10px; }
 .top100 th:nth-child(-n+2), .top100 td:nth-child(-n+2) { text-align: left; }
@@ -137,7 +138,7 @@ svg.spark { display: block; margin-left: auto; }
 .vid .sound { position: absolute; right: 12px; top: 12px; }
 .explainer p { margin: 0 0 10px; color: var(--muted); }
 .name { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
-.name .s { color: #F7931A; } .name .t { color: var(--tether); }
+.name .s { color: #F7931A; }
 
 /* share */
 .share { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: center; }
@@ -201,9 +202,42 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
 
 @media (max-width: 860px) {
   .tiles, .rates { grid-template-columns: repeat(2, 1fr); }
+  /* phones: one-line scrolling control rows, bigger tap targets */
+  .tabs, .toolbar, #range { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar, .toolbar::-webkit-scrollbar, #range::-webkit-scrollbar { display: none; }
+  .tabs button, .seg button { white-space: nowrap; flex: none; }
+  .seg { flex-wrap: nowrap; flex: none; }
+  .toolbar .spacer { display: none; }
+  .seg button { padding: 8px 11px; }
+  .tabs button { padding: 9px 12px; }
+  .h2h > *, .share > *, .explainer > *, .getit > * { min-width: 0; }
+  header { padding: 12px 0; }
+  .nav { order: 3; width: 100%; }
+  .nav a { flex: 1; text-align: center; }
   .top100 td:nth-child(2) .tk { display: block; margin-left: 0; }
   .h2h, .share, .explainer, .getit { grid-template-columns: 1fr; }
   #chart { height: 360px; }
+}
+/* phones: CoinMarketCap-app style tables, # · coin · price · 24h · market cap */
+.short, .m-only { display: none; }
+@media (max-width: 640px) {
+  .market, .top100 { min-width: 0; table-layout: auto; }
+  .market th:nth-child(n+4), .market td:nth-child(n+4), .top100 th:nth-child(n+4), .top100 td:nth-child(n+4) { display: none; }
+  .m-only { display: block !important; }
+  .coin .algo { display: none; }
+  .market td:nth-child(3), .top100 td:nth-child(3) { white-space: nowrap; }
+  .market th, .market td, .top100 th, .top100 td { padding: 12px 5px; font-size: 14px; }
+  .market td:first-child, .market th:first-child, .top100 td:first-child, .top100 th:first-child { padding-left: 0; width: 22px; }
+  .market td:nth-child(2), .top100 td:nth-child(2) { white-space: normal; }
+  .top100 th:nth-child(1), .top100 td:nth-child(1), .top100 th:nth-child(2), .top100 td:nth-child(2) { position: static; }
+  .coin { gap: 8px; }
+  .coin .tk { display: block; margin-left: 0 !important; font-size: 12px; }
+  .coin .algo { font-size: 11px; }
+  .market .small { font-size: 11px; }
+  .full { display: none; } .short { display: inline; }
+  .tablewrap { margin: 0; padding: 0; overflow-x: visible; }
+  .cmp td, .cmp th { white-space: normal; font-size: 14px; padding: 10px 4px; }
+  .market td.diff:nth-child(2) { white-space: nowrap; }
 }
 @media (max-width: 420px) {
   .tile .v, .rate .v { font-size: 18px; }
@@ -224,20 +258,6 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
   </header>
 
   <div id="page-home">
-  <section class="card hero">
-    <h1 id="headline">Loading live prices…</h1>
-    <p id="subline">&nbsp;</p>
-    <div class="bar"><div class="fill" id="fill" style="width:0"></div></div>
-    <div class="bar-scale"><span>0%</span><span>100% = XBT flips ShaT coin</span></div>
-    <div class="tiles">
-      <div class="tile"><div class="k">Bitcoin (XBT) market cap</div><div class="v" id="t-xmc">–</div><div class="s" id="t-xmc-s">&nbsp;</div></div>
-      <div class="tile"><div class="k">ShaT coin (BTC) market cap</div><div class="v" id="t-bmc">–</div><div class="s" id="t-bmc-s">&nbsp;</div></div>
-      <div class="tile"><div class="k">XBT price to flip ShaT</div><div class="v" id="t-flip">–</div><div class="s" id="t-flip-s">&nbsp;</div></div>
-      <div class="tile"><div class="k">Best ratio since listing</div><div class="v" id="t-ath">–</div><div class="s" id="t-ath-s">&nbsp;</div></div>
-    </div>
-    <div class="rates" id="rates"></div>
-  </section>
-
   <section class="card">
     <h2>Market caps</h2>
     <div class="tablewrap">
@@ -254,16 +274,30 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
   <section class="card">
     <div class="explainer">
       <div class="vid">
-        <video id="vid" src="/media/shatcoin.mp4?v=2" poster="/media/shatcoin-poster.jpg?v=2" autoplay muted loop playsinline preload="metadata" controls></video>
+        <video id="vid" src="/media/shatcoin.mp4?v=3" poster="/media/shatcoin-poster.jpg?v=3" autoplay muted loop playsinline preload="metadata" controls></video>
         <button class="btn sound" id="sound">🔊 Sound on</button>
       </div>
       <div>
-        <div class="name"><span class="s">Sha</span><span class="t">T</span> coin</div>
+        <div class="name"><span class="s">ShaT</span> Coin</div>
         <p>When Bitcoin split on August 8, 2026, one chain enforced BIP-110 against spam and moved its mining to BLAKE2b. That chain is Bitcoin (XBT).</p>
-        <p>The other kept <b>SHA</b>-256d mining, powered by <b>T</b>ether <img class="teth" src="/img/tether.png" alt="Tether">. SHA plus Tether: ShaT coin.</p>
+        <p>The other kept <b>SHA</b>-256d mining, powered by <b>T</b>ether <img class="teth" src="/img/tether.png" alt="Tether">. SHA plus Tether: ShaT Coin.</p>
         <button class="btn" id="share-video">Share this</button>
       </div>
     </div>
+  </section>
+
+  <section class="card hero">
+    <h1 id="headline">Loading live prices…</h1>
+    <p id="subline">&nbsp;</p>
+    <div class="bar"><div class="fill" id="fill" style="width:0"></div></div>
+    <div class="bar-scale"><span>0%</span><span>100% = XBT flips ShaT Coin</span></div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Bitcoin (XBT) market cap</div><div class="v" id="t-xmc">–</div><div class="s" id="t-xmc-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">ShaT Coin (BTC) market cap</div><div class="v" id="t-bmc">–</div><div class="s" id="t-bmc-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">XBT price to flip ShaT</div><div class="v" id="t-flip">–</div><div class="s" id="t-flip-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">Best ratio since listing</div><div class="v" id="t-ath">–</div><div class="s" id="t-ath-s">&nbsp;</div></div>
+    </div>
+    <div class="rates" id="rates"></div>
   </section>
 
   <section class="card">
@@ -387,12 +421,12 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
           <tbody id="toprows"></tbody>
         </table>
       </div>
-      <div class="small" style="margin-top:10px">Top 100 by market cap from <a href="https://www.coingecko.com" target="_blank" rel="noopener" style="color:inherit">CoinGecko</a>, with Bitcoin (XBT) added from NeoxEX. CoinGecko lists ShaT coin as "Bitcoin"; it is shown here as ShaT coin. Updates every 2 minutes.</div>
+      <div class="small" style="margin-top:10px">Top 100 by market cap from <a href="https://www.coingecko.com" target="_blank" rel="noopener" style="color:inherit">CoinGecko</a>, with Bitcoin (XBT) added from NeoxEX. CoinGecko lists ShaT Coin as "Bitcoin"; it is shown here as ShaT Coin. Updates every 2 minutes.</div>
     </section>
   </div>
 
   <footer class="card">
-    Bitcoin (XBT) is the BLAKE2b / BIP-110 chain, listed as BTCB2 on NeoxEX. ShaT coin (BTC) is the SHA-256d chain, powered by Tether <img class="teth" src="/img/tether.png" alt="Tether">. The chains split after block 961,631 on 2026-08-08, and XBT switched to BLAKE2b proof of work at block 961,640 on 2026-08-30.
+    Bitcoin (XBT) is the BLAKE2b / BIP-110 chain, listed as BTCB2 on NeoxEX. ShaT Coin (BTC) is the SHA-256d chain, powered by Tether <img class="teth" src="/img/tether.png" alt="Tether">. The chains split after block 961,631 on 2026-08-08, and XBT switched to BLAKE2b proof of work at block 961,640 on 2026-08-30.
     Before the split both coins share one price history, so the "XBT + Bitcoin history" chart shows Bitcoin's Coinbase price up to the split and NeoxEX trading from 2026-09-01. Between those dates XBT had no market price.
     XBT's price comes from the NeoxEX BTCB2/BTC order book, converted to dollars at the Coinbase BTC price. ShaT's 24-hour volume is across all exchanges (CoinGecko); per-candle ShaT volume is Coinbase.
     Circulating supply counts every coin issued up to each chain's current block height, so lost coins and unclaimed rewards are included. Chain heights come from mempool.guide (XBT) and mempool.space (ShaT).
@@ -409,6 +443,20 @@ const save = (k, v) => { try { localStorage.setItem("flip." + k, JSON.stringify(
 const restore = (k, d) => { try { const v = JSON.parse(localStorage.getItem("flip." + k)); return v ?? d; } catch (e) { return d; } };
 const state = Object.assign({ view: "ratio", tf: "1h", type: "candle", scale: "0", range: "All", xunit: "usd", vunit: "24h", vscale: "1", ind: { vol: true } }, restore("state", {}));
 const TETHER = `<img class="teth" src="/img/tether.png" alt="Tether">`;
+// "ShaT" is written with the Tether logo as its T wherever it shows on screen
+function decorate(root = document.body) {
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) =>
+    n.nodeValue.includes("ShaT") && !n.parentElement.closest("script,style,title,svg,code,textarea") ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+  const hits = []; while (w.nextNode()) hits.push(w.currentNode);
+  for (const n of hits) {
+    const frag = document.createDocumentFragment();
+    n.nodeValue.split("ShaT").forEach((part, i) => {
+      if (i) { frag.append("Sha"); const im = document.createElement("img"); im.className = "tT"; im.src = "/img/tether.png"; im.alt = "T"; frag.append(im); }
+      frag.append(part);
+    });
+    n.replaceWith(frag);
+  }
+}
 
 // ---- formatting
 const usd = (v, d) => v == null || !isFinite(v) ? "–" : "$" + v.toLocaleString("en-US", { maximumFractionDigits: d ?? (v >= 100 ? 0 : 2), minimumFractionDigits: d ?? (v >= 100 ? 0 : 2) });
@@ -510,8 +558,8 @@ function render() {
   const r24 = closeAgo(rs, 86400), r7 = closeAgo(rs, 7 * 86400), rFirst = join({ xbt: D.candles.xbt["1d"], btc: D.candles.btc["1d"] })[0];
 
   // hero
-  $("headline").textContent = `Bitcoin (XBT) is worth ${ratio.toFixed(2)}% of ShaT coin`;
-  $("subline").innerHTML = `To flip ShaT coin, XBT has to rise <b>${num(mult, 1)}×</b>, to about <b>${flipBtc.toFixed(4)} BTC</b> (${usd(flipBtc * B.usd, 0)}). ` +
+  $("headline").textContent = `Bitcoin (XBT) is worth ${ratio.toFixed(2)}% of ShaT Coin`;
+  $("subline").innerHTML = `To flip ShaT Coin, XBT has to rise <b>${num(mult, 1)}×</b>, to about <b>${flipBtc.toFixed(4)} BTC</b> (${usd(flipBtc * B.usd, 0)}). ` +
     (r24 != null ? `Over the last 24 hours the gap ${ratio >= r24 ? "<span class=up>narrowed</span>" : "<span class=down>widened</span>"} (${r24.toFixed(2)}% → ${ratio.toFixed(2)}%).` : "");
   $("fill").style.width = Math.min(100, ratio) + "%";
   $("t-xmc").textContent = big(xmc); $("t-xmc-s").innerHTML = chg(xc.d1) + " 24h";
@@ -521,7 +569,7 @@ function render() {
 
   // volume: ShaT across all exchanges once CoinGecko has answered, else Coinbase
   const xVol = X.quoteVolume24h * B.usd;
-  const bAll = VOL && VOL.shat.length ? VOL.shat[VOL.shat.length - 1].value : null;
+  const bAll = VOL && VOL.shat.length && VOL.sources.shat.includes("all") ? VOL.shat[VOL.shat.length - 1].value : null;
   const bVol = bAll ?? B.volume24h * B.usd;
 
   // table
@@ -529,24 +577,24 @@ function render() {
   const bSpark = BH.filter(c => c.time >= now - 7 * 86400).map(c => c.close);
   const rows = [
     { name: "Bitcoin", tk: "XBT", algo: "BLAKE2b", logo: "/img/xbt.png", price: xUsd, sub: btcf(X.btc), c: xc, mc: xmc, vol: xVol, volSub: num(X.volume24h) + " XBT · NeoxEX", sup: xs, spark: xSpark },
-    { name: "ShaT coin", tk: "BTC", algo: "SHA-256d · powered by Tether" + TETHER, logo: "/img/shat.png", price: B.usd, sub: "1.000000 BTC", c: bc, mc: bmc, vol: bVol, volSub: bAll ? num(bVol / B.usd) + " BTC · all exchanges" : num(B.volume24h) + " BTC · Coinbase", sup: bs, spark: bSpark },
+    { name: "ShaT Coin", tk: "BTC", algo: "SHA-256d · powered by Tether" + TETHER, logo: "/img/shat.png", price: B.usd, sub: "1.000000 BTC", c: bc, mc: bmc, vol: bVol, volSub: bAll ? num(bVol / B.usd) + " BTC · all exchanges" : num(B.volume24h) + " BTC · Coinbase", sup: bs, spark: bSpark },
   ].sort((a, b) => b.mc - a.mc);
   $("rows").innerHTML = rows.map((r, i) => `<tr>
     <td class="muted">${i + 1}</td>
-    <td><div class="coin"><img src="${r.logo}" alt=""><div><b>${r.name}</b><span class="tk">${r.tk}</span><span class="algo">${r.algo}</span></div></div></td>
-    <td>${usd(r.price)}<div class="small">${r.sub}</div></td>
+    <td><div class="coin"><img src="${r.logo}" alt=""><div><b>${r.name}</b><span class="tk">${r.tk}</span><span class="algo">${r.algo}</span><span class="m-only small">${big(r.mc)} · ${(r.mc / (xmc + bmc) * 100).toFixed(2)}%</span></div></div></td>
+    <td>${usd(r.price)}<div class="small">${r.sub}</div><div class="m-only">${chg(r.c.d1)}</div></td>
     <td>${chg(r.c.h1)}</td><td>${chg(r.c.d1)}</td><td>${chg(r.c.d7)}</td><td>${chg(r.c.ytd)}</td>
     <td>${big(r.mc)}<div class="small">${(r.mc / (xmc + bmc) * 100).toFixed(2)}% of combined</div></td>
     <td>${big(r.vol)}<div class="small">${r.volSub}</div></td>
     <td>${num(r.sup)} ${r.tk}</td>
     <td>${spark(r.spark)}</td></tr>`).join("") +
-    `<tr><td class="diff"></td><td class="diff">Difference</td><td class="diff">XBT = ${(xUsd / B.usd * 100).toFixed(2)}% of ShaT</td>
+    `<tr><td class="diff"></td><td class="diff">Difference</td><td class="diff"><span class="m-only">${big(bmc - xmc)} gap</span><span class="full">XBT = ${(xUsd / B.usd * 100).toFixed(2)}% of ShaT</span></td>
      <td class="diff">${pct(xc.h1 - bc.h1)}</td><td class="diff">${pct(xc.d1 - bc.d1)}</td><td class="diff">${pct(xc.d7 - bc.d7)}</td><td class="diff">${pct(xc.ytd - bc.ytd)}</td>
      <td class="diff">${big(bmc - xmc)} gap</td><td class="diff">XBT = ${(xVol / bVol * 100).toFixed(3)}% of ShaT</td>
      <td class="diff">${xs >= bs ? "+" : ""}${num(xs - bs)} XBT</td><td class="diff"></td></tr>`;
 
   // market share donut and the big drop
-  donut([{ name: "Bitcoin (XBT)", v: xmc, color: "var(--xbt)" }, { name: "ShaT coin (BTC)", v: bmc, color: "var(--btc)" }]);
+  donut([{ name: "Bitcoin (XBT)", v: xmc, color: "var(--xbt)" }, { name: "ShaT Coin (BTC)", v: bmc, color: "var(--btc)" }]);
   const held = xUsd + B.usd;
   $("facts").innerHTML = [
     jan1 && fact("Bitcoin (XBT) this year", pct(xc.ytd, 1), `${usd(jan1.open, 0)} on Jan 1 → ${usd(xUsd, 0)} today`, xc.ytd),
@@ -580,6 +628,7 @@ function render() {
   renderRates();
   if (!$("page-top").hidden) renderTop();
   whatIf();
+  decorate($("page-home"));
 }
 
 // four ways to price one coin in the other
@@ -603,7 +652,7 @@ async function loadTop() {
   catch (e) { if (!TOP) $("rank-head").textContent = "Couldn't load the top 100: " + e.message; }
 }
 function topList() {
-  const list = TOP.coins.map(c => c.id === "bitcoin" ? { ...c, name: "ShaT coin", image: "/img/shat.png", tether: true } : c);
+  const list = TOP.coins.map(c => c.id === "bitcoin" ? { ...c, name: "ShaT Coin", image: "/img/shat.png", tether: true } : c);
   if (CUR) list.push({ id: "xbt", symbol: "XBT", name: "Bitcoin", image: "/img/xbt.png", price: CUR.xUsd, marketCap: CUR.xmc, volume: CUR.xVol, supply: CUR.xs,
     h1: CUR.xc.h1, d1: CUR.xc.d1, d7: CUR.xc.d7, spark: thin(CUR.xSpark, 56), me: true });
   return list.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0)).map((c, i) => ({ ...c, rank: i + 1 }));
@@ -621,11 +670,12 @@ function renderTop() {
   const rows = q ? list.filter(c => c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)) : list;
   $("toprows").innerHTML = rows.map(c => `<tr class="${c.me ? "me" : ""}" id="${c.me ? "row-xbt" : ""}">
     <td>${c.rank}</td>
-    <td><div class="coin"><img src="${c.image}" alt="" loading="lazy"><div><b>${c.name}</b><span class="tk">${c.symbol}</span>${c.tether ? `<span class="algo">powered by Tether${TETHER}</span>` : c.me ? `<span class="algo">BLAKE2b</span>` : ""}</div></div></td>
-    <td>${fmtPrice(c.price)}</td><td>${chg(c.h1)}</td><td>${chg(c.d1)}</td><td>${chg(c.d7)}</td>
-    <td>${c.marketCap ? "$" + num(c.marketCap) : "–"}</td><td>${c.volume ? "$" + num(c.volume) : "–"}</td>
+    <td><div class="coin"><img src="${c.image}" alt="" loading="lazy"><div><b>${c.name}</b><span class="tk">${c.symbol}</span>${c.tether ? `<span class="algo">powered by Tether${TETHER}</span>` : c.me ? `<span class="algo">BLAKE2b</span>` : ""}<span class="m-only small">${c.marketCap ? big(c.marketCap) : ""}</span></div></div></td>
+    <td>${fmtPrice(c.price)}<div class="m-only">${chg(c.d1)}</div></td><td>${chg(c.h1)}</td><td>${chg(c.d1)}</td><td>${chg(c.d7)}</td>
+    <td>${c.marketCap ? `<span class="full">$${num(c.marketCap)}</span><span class="short">${big(c.marketCap)}</span>` : "–"}</td><td>${c.volume ? "$" + num(c.volume) : "–"}</td>
     <td>${c.supply ? num(c.supply) + " " + c.symbol : "–"}</td>
     <td>${sparkFixed(c.spark || [], c.d7)}</td></tr>`).join("") || `<tr><td></td><td colspan="9" class="muted">No coins match "${q}"</td></tr>`;
+  decorate($("page-top"));
 }
 // sparkline coloured by the 7-day change, like CoinMarketCap
 function sparkFixed(vals, d7) {
@@ -680,8 +730,9 @@ function whatIf() {
   if (!(p > 0)) { $("whatif-out").textContent = ""; return; }
   const B = D.btc, xs = D.xbt.chain.supply, bs = B.chain.supply;
   const xmc = p * B.usd * xs, r = xmc / (B.usd * bs) * 100;
+  setTimeout(() => decorate($("whatif-out")));
   $("whatif-out").innerHTML = `XBT would be <b>${usd(p * B.usd, 0)}</b>, a market cap of <b>${big(xmc)}</b>.<br>
-    That is <b>${r.toFixed(1)}%</b> of ShaT coin, ${num(p / D.xbt.btc, 1)}× today's XBT price.` + (r >= 100 ? ` <span class="up"><b>Flipped.</b></span>` : "");
+    That is <b>${r.toFixed(1)}%</b> of ShaT Coin, ${num(p / D.xbt.btc, 1)}× today's XBT price.` + (r >= 100 ? ` <span class="up"><b>Flipped.</b></span>` : "");
 }
 
 // ---- chart ---------------------------------------------------------------
@@ -793,7 +844,7 @@ async function drawChart(keepRange) {
     data = pts.map(p => ({ time: p.time, value: p.ratio }));
     main.setData(data);
     addIndicators(pts.map(p => ({ time: p.time, close: p.ratio })), null);
-    legend = `<span><i style="background:${xbt}"></i>XBT market cap as a % of ShaT coin's market cap (100% = flipped)</span>`;
+    legend = `<span><i style="background:${xbt}"></i>XBT market cap as a % of ShaT Coin's market cap (100% = flipped)</span>`;
   } else if (state.view === "mcap") {
     const pts = join(c); fmt = big;
     const f = { type: "custom", formatter: big };
@@ -803,7 +854,7 @@ async function drawChart(keepRange) {
     data = pts.map(p => ({ time: p.time, value: p.xmc }));
     main.setData(data);
     s2.setData(pts.map(p => ({ time: p.time, value: p.bmc })));
-    legend = `<span><i style="background:${xbt}"></i>Bitcoin (XBT) market cap, left scale</span><span><i style="background:${btc}"></i>ShaT coin (BTC) market cap, right scale</span>`;
+    legend = `<span><i style="background:${xbt}"></i>Bitcoin (XBT) market cap, left scale</span><span><i style="background:${btc}"></i>ShaT Coin (BTC) market cap, right scale</span>`;
   } else if (state.view === "vol") {
     fmt = big; const f = { type: "custom", formatter: big };
     if (rolling) {
@@ -812,7 +863,7 @@ async function drawChart(keepRange) {
       const s2 = chart.addLineSeries({ color: btc, lineWidth: 2, priceFormat: f }); extra.push(s2);
       data = VOL.xbt; main.setData(VOL.xbt); s2.setData(VOL.shat);
       const lx = VOL.xbt[VOL.xbt.length - 1], ls = VOL.shat[VOL.shat.length - 1];
-      legend = `<span><i style="background:${xbt}"></i>XBT 24h volume, NeoxEX (its only market): ${big(lx.value)}</span><span><i style="background:${btc}"></i>ShaT 24h volume, all exchanges (CoinGecko): ${big(ls.value)}</span><span>XBT = ${(lx.value / ls.value * 100).toFixed(4)}% of ShaT${mode === 1 ? " · log scale" : ""}</span>`;
+      legend = `<span><i style="background:${xbt}"></i>XBT 24h volume, NeoxEX (its only market): ${big(lx.value)}</span><span><i style="background:${btc}"></i>ShaT 24h volume, ${VOL.sources.shat}: ${big(ls.value)}</span><span>XBT = ${(lx.value / ls.value * 100).toFixed(4)}% of ShaT${mode === 1 ? " · log scale" : ""}</span>`;
     } else {
       const pts = join(c);
       main = chart.addHistogramSeries({ color: xbt, priceFormat: f, priceScaleId: "left" });
@@ -860,14 +911,14 @@ async function drawChart(keepRange) {
     addMain(data, { type: "custom", minMove: 0.01, formatter: fmt }, btc);
     if (last) main.setMarkers([{ time: last, position: "aboveBar", color: css("--down"), shape: "arrowDown", text: "Split" }]);
     addIndicators(data, vol);
-    legend = `<span>ShaT coin (BTC) in USD, Coinbase. Volume bars are Coinbase since the split.</span>`;
+    legend = `<span>ShaT Coin (BTC) in USD, Coinbase. Volume bars are Coinbase since the split.</span>`;
   }
   main.__fmt = fmt;
   const lastReal = [...data].reverse().find(d => d.close != null || d.value != null);
   lastBar = lastReal || null;
   const on = Object.entries(state.ind).filter(([k, v]) => v && k.startsWith("ma")).map(([k]) => k.replace("ma", "MA "));
   if (on.length && !$("ind").hidden) legend += `<span>${on.join(", ")}</span>`;
-  $("legend").innerHTML = legend;
+  $("legend").innerHTML = legend; decorate($("legend"));
   readout(null);
   if (kept) chart.timeScale().setVisibleLogicalRange(kept); else applyRange();
 }
@@ -923,7 +974,7 @@ async function shareLink(text) {
   if (navigator.share) { try { await navigator.share(data); } catch (e) {} return; }
   try { await navigator.clipboard.writeText(`${text} ${data.url}`); toast("Link copied"); } catch (e) {}
 }
-$("share-video").addEventListener("click", () => shareLink("Why is it called ShaT coin? SHA-256 + Tether. Watch XBT vs ShaT live:"));
+$("share-video").addEventListener("click", () => shareLink("Why is it called ShaT Coin? SHA-256 + Tether. Watch XBT vs ShaT live:"));
 
 // ---- install, widget, embed
 let deferred = null;
@@ -973,7 +1024,7 @@ function tick() {
   $("updated").textContent = `Live · updated ${ago(s)} ago`;
   $("dot").classList.toggle("stale", s > 120);
 }
-route(); load(); setInterval(load, 30000); setInterval(tick, 5000); setInterval(loadVolume, 600000);
+decorate(); route(); load(); setInterval(load, 30000); setInterval(tick, 5000); setInterval(loadVolume, 600000);
 </script>
 </body>
 </html>

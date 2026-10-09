@@ -28,7 +28,7 @@ w.addSpacer(6);
 
 // ratio
 const r = w.addText(s.ratio.toFixed(2) + "%"); r.font = Font.heavySystemFont(size === "small" ? 30 : 34); r.textColor = GOLD;
-const cap = w.addText("XBT as a share of ShaT coin"); cap.font = Font.systemFont(11); cap.textColor = MUTED;
+const cap = w.addText("XBT as a share of ShaT Coin"); cap.font = Font.systemFont(11); cap.textColor = MUTED;
 w.addSpacer(6);
 
 // progress bar
@@ -41,7 +41,7 @@ const m = w.addText(s.flipMultiple.toFixed(1) + "× to flip"); m.font = Font.sys
 
 if (size !== "small") {
   w.addSpacer(8);
-  for (const [img, name, v] of [[xbtImg, "Bitcoin XBT", s.xbt], [shatImg, "ShaT coin BTC", s.shat]]) {
+  for (const [img, name, v] of [[xbtImg, "Bitcoin XBT", s.xbt], [shatImg, "ShaT Coin BTC", s.shat]]) {
     const row = w.addStack(); row.centerAlignContent();
     if (img) { const i = row.addImage(img); i.imageSize = new Size(16, 16); row.addSpacer(6); }
     const n = row.addText(name); n.font = Font.systemFont(13); n.textColor = INK;
