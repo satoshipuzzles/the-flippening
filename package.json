@@ -1,0 +1,6 @@
+{
+  "name": "flippening",
+  "private": true,
+  "description": "XBT vs BTC market cap tracker",
+  "engines": { "node": ">=18" }
+}

@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Flippening</title>
+<meta name="description" content="XBT vs BTC: live market caps, prices and how close XBT is to flipping BTC.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+:root {
+  --bg: #f7f8fa; --card: #ffffff; --ink: #0d1421; --muted: #616e85; --line: #eff2f5;
+  --accent: #f7931a; --xbt: #f7931a; --btc: #6b7a90; --up: #16c784; --down: #ea3943;
+  --track: #eef0f3; --chip: #eff2f5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --muted: #8b95a5; --line: #222a35;
+    --btc: #8d9bb0; --track: #222a35; --chip: #222a35;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --muted: #8b95a5; --line: #222a35;
+  --btc: #8d9bb0; --track: #222a35; --chip: #222a35;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+:root { color-scheme: light dark; }
+:root[data-theme="light"] { color-scheme: light; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 48px; }
+header { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+.brand .mark { width: 30px; height: 30px; border-radius: 50%; background: var(--xbt); color: #fff; display: grid; place-items: center; font-size: 16px; }
+.status { color: var(--muted); font-size: 13px; text-align: right; }
+.status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--up); margin-right: 6px; vertical-align: 1px; }
+.status .dot.stale { background: var(--down); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -0.01em; }
+.muted { color: var(--muted); }
+.up { color: var(--up); } .down { color: var(--down); }
+
+/* hero */
+.hero h1 { font-size: clamp(22px, 4vw, 32px); margin: 0 0 6px; letter-spacing: -0.02em; line-height: 1.2; }
+.hero p { margin: 0; color: var(--muted); font-size: 16px; }
+.bar { position: relative; height: 18px; background: var(--track); border-radius: 9px; margin: 18px 0 8px; overflow: hidden; }
+.bar .fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #f7931a, #ffb547); border-radius: 9px; min-width: 6px; transition: width .6s; }
+.bar-scale { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
+.tile { background: var(--bg); border-radius: 10px; padding: 12px 14px; }
+.tile .k { font-size: 13px; color: var(--muted); }
+.tile .v { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.tile .s { font-size: 13px; color: var(--muted); }
+
+/* table */
+.tablewrap { overflow-x: auto; margin: 0 -20px; padding: 0 20px; }
+table { width: 100%; border-collapse: collapse; min-width: 860px; }
+th, td { padding: 14px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 13px; font-weight: 600; color: var(--muted); }
+th:nth-child(-n+2), td:nth-child(-n+2) { text-align: left; }
+tbody tr:last-child td { border-bottom: 0; }
+td { font-weight: 500; }
+.coin { display: flex; align-items: center; gap: 10px; }
+.coin .ic { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 13px; flex: none; }
+.coin b { font-weight: 700; }
+.coin .tk { color: var(--muted); font-size: 13px; margin-left: 4px; }
+.coin .algo { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+td.diff { background: var(--bg); color: var(--muted); font-size: 13px; }
+svg.spark { display: block; margin-left: auto; }
+
+/* chart */
+.chart-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.seg { display: inline-flex; background: var(--chip); border-radius: 9px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; color: var(--muted); font: 600 13px Inter, sans-serif; padding: 6px 11px; border-radius: 7px; cursor: pointer; }
+.seg button.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+#chart { height: 400px; }
+.legend { display: flex; gap: 16px; font-size: 13px; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.chart-note { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+/* head to head */
+.h2h { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cmp { width: 100%; min-width: 0; }
+.cmp td, .cmp th { padding: 11px 6px; }
+.cmp td:first-child { color: var(--muted); font-weight: 500; text-align: left; white-space: normal; }
+.cmp th:first-child { text-align: left; }
+.calc label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.calc input { width: 100%; font: 600 18px Inter, sans-serif; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.calc .out { margin-top: 14px; font-size: 16px; }
+.calc .out b { font-size: 22px; }
+footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
+footer a { color: var(--muted); }
+.err { color: var(--down); font-size: 14px; }
+
+@media (max-width: 860px) {
+  .tiles { grid-template-columns: repeat(2, 1fr); }
+  .h2h { grid-template-columns: 1fr; }
+  #chart { height: 320px; }
+}
+@media (max-width: 420px) {
+  .tile .v { font-size: 19px; }
+  .card { padding: 16px; }
+  .tablewrap { margin: 0 -16px; padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="mark">⇅</span> The Flippening</div>
+    <div class="status"><span class="dot" id="dot"></span><span id="updated">Loading…</span></div>
+  </header>
+
+  <section class="card hero">
+    <h1 id="headline">Loading live prices…</h1>
+    <p id="subline">&nbsp;</p>
+    <div class="bar"><div class="fill" id="fill" style="width:0"></div></div>
+    <div class="bar-scale"><span>0%</span><span id="scale-mid"></span><span>100% = flipped</span></div>
+    <div class="tiles">
+      <div class="tile"><div class="k">XBT market cap</div><div class="v" id="t-xmc">–</div><div class="s" id="t-xmc-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">BTC market cap</div><div class="v" id="t-bmc">–</div><div class="s" id="t-bmc-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">XBT price to flip BTC</div><div class="v" id="t-flip">–</div><div class="s" id="t-flip-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">Best ratio since listing</div><div class="v" id="t-ath">–</div><div class="s" id="t-ath-s">&nbsp;</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Market caps</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Coin</th><th>Price</th><th>1h</th><th>24h</th><th>7d</th>
+          <th>Market cap</th><th>Volume (24h)</th><th>Circulating supply</th><th>Last 7 days</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="chart-head">
+      <div class="seg" id="view">
+        <button data-v="ratio" class="on">Flippening %</button>
+        <button data-v="mcap">Market caps</button>
+        <button data-v="xbt">XBT price</button>
+        <button data-v="btc">BTC price</button>
+      </div>
+      <div class="controls">
+        <div class="seg" id="unit" hidden>
+          <button data-u="usd" class="on">USD</button>
+          <button data-u="btc">in BTC</button>
+        </div>
+        <div class="seg" id="tf">
+          <button data-tf="1h" class="on">1h</button>
+          <button data-tf="1d">1d</button>
+        </div>
+        <div class="seg" id="range">
+          <button data-r="1">24H</button>
+          <button data-r="7">7D</button>
+          <button data-r="30">30D</button>
+          <button data-r="all" class="on">All</button>
+        </div>
+      </div>
+    </div>
+    <div id="chart"></div>
+    <div class="legend" id="legend"></div>
+    <div class="chart-note">Scroll to zoom, drag to pan, hover to read a value.</div>
+  </section>
+
+  <section class="h2h">
+    <div class="card">
+      <h2>Head to head</h2>
+      <table class="cmp">
+        <thead><tr><th></th><th>XBT</th><th>BTC</th><th>Difference</th></tr></thead>
+        <tbody id="cmp"></tbody>
+      </table>
+    </div>
+    <div class="card calc">
+      <h2>What if?</h2>
+      <label for="whatif">XBT price in BTC</label>
+      <input id="whatif" type="number" step="0.001" min="0" value="0.1">
+      <div class="out" id="whatif-out"></div>
+      <h2 style="margin-top:24px">Ratio change</h2>
+      <table class="cmp"><tbody id="ratiochg"></tbody></table>
+    </div>
+  </section>
+
+  <footer class="card">
+    XBT is the BLAKE2b / BIP-110 chain (listed as BTCB2 on NeoxEX); BTC is the SHA-256d chain. The chains split after block 961,631 on 2026-08-08.
+    XBT's price comes from the NeoxEX BTCB2/BTC order book and is converted to dollars at the Coinbase BTC price. BTC volume is Coinbase only.
+    Circulating supply is every coin issued up to each chain's current block height, so lost coins and unclaimed rewards are counted. Chain heights come from mempool.guide (XBT) and mempool.space (BTC).
+    The page refreshes every 30 seconds.
+  </footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let D = null, state = { view: "ratio", tf: "1h", range: "all", unit: "usd" };
+
+// ---- formatting
+const usd = (v, d) => v == null || !isFinite(v) ? "–" : "$" + v.toLocaleString("en-US", { maximumFractionDigits: d ?? (v >= 100 ? 0 : 2), minimumFractionDigits: d ?? (v >= 100 ? 0 : 2) });
+const big = (v) => { if (v == null || !isFinite(v)) return "–"; const a = Math.abs(v);
+  if (a >= 1e12) return "$" + (v / 1e12).toFixed(2) + "T"; if (a >= 1e9) return "$" + (v / 1e9).toFixed(2) + "B";
+  if (a >= 1e6) return "$" + (v / 1e6).toFixed(2) + "M"; return usd(v); };
+const btcf = (v, d = 6) => v == null ? "–" : v.toFixed(d) + " BTC";
+const num = (v, d = 0) => v.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const pct = (v, d = 2) => v == null || !isFinite(v) ? "–" : (v >= 0 ? "+" : "") + v.toFixed(d) + "%";
+const chg = (v) => `<span class="${v >= 0 ? "up" : "down"}">${v == null || !isFinite(v) ? "–" : (v >= 0 ? "▲ " : "▼ ") + Math.abs(v).toFixed(2) + "%"}</span>`;
+const ago = (s) => s < 60 ? `${Math.round(s)} s` : s < 3600 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1)} h`;
+
+// ---- supply model: coins issued through height h; heights between the split and now are interpolated
+function supplyAt(h) { let t = 0, sub = 50e8, from = 0;
+  while (from <= h && sub > 0) { const to = Math.min(h, from + 209999); t += (to - from + 1) * sub; from += 210000; sub = Math.floor(sub / 2); }
+  return t / 1e8; }
+function heightAt(chain, ts) {
+  const { height: H, time: T } = D.split, h = chain.height, tt = chain.tipTime;
+  if (ts >= tt) return h; if (ts <= T) return H;
+  return Math.round(H + (ts - T) / (tt - T) * (h - H));
+}
+const supplyAtTime = (chain, ts) => supplyAt(heightAt(chain, ts));
+
+// ---- build aligned series from candles
+function series(tf) {
+  const xc = D.candles.xbt[tf], bc = D.candles.btc[tf];
+  const bmap = new Map(bc.map(c => [c.time, c]));
+  let lastB = null; const out = [];
+  const bsorted = bc; let bi = 0;
+  for (const x of xc) {
+    while (bi < bsorted.length && bsorted[bi].time <= x.time) { lastB = bsorted[bi]; bi++; }
+    const b = bmap.get(x.time) || lastB; if (!b) continue;
+    const xs = supplyAtTime(D.xbt.chain, x.time), bs = supplyAtTime(D.btc.chain, x.time);
+    out.push({ time: x.time, xbtBtc: x, btc: b, xbtUsd: { open: x.open * b.open, high: x.high * b.close, low: x.low * b.close, close: x.close * b.close },
+      xmc: x.close * b.close * xs, bmc: b.close * bs, ratio: x.close * xs / bs * 100 });
+  }
+  return out;
+}
+// value of XBT/BTC (or BTC/USD) `sec` seconds ago, from hourly candles
+function closeAgo(cs, sec) { const t = Date.now() / 1000 - sec; let best = null; for (const c of cs) { if (c.time <= t) best = c; else break; } return best ? best.close : null; }
+
+// ---- render
+function render() {
+  const X = D.xbt, B = D.btc, now = D.at / 1000;
+  const xUsd = X.btc * B.usd;
+  const xs = X.chain.supply, bs = B.chain.supply;
+  const xmc = xUsd * xs, bmc = B.usd * bs;
+  const ratio = xmc / bmc * 100;
+  const flipBtc = bmc / xs / B.usd; // XBT price in BTC that equals BTC's market cap
+  const mult = flipBtc / X.btc;
+
+  const H = D.candles.xbt["1h"], BH = D.candles.btc["1h"];
+  const xb1h = closeAgo(H, 3600), xb7d = closeAgo(D.candles.xbt["1h"], 7 * 86400);
+  const b1h = closeAgo(BH, 3600), b24 = B.open24h, b7d = closeAgo(BH, 7 * 86400);
+  const xb24 = X.btc / (1 + X.changePct24h / 100);
+  const bc = { h1: (B.usd / b1h - 1) * 100, d1: (B.usd / b24 - 1) * 100, d7: (B.usd / b7d - 1) * 100 };
+  const xc = { h1: (xUsd / (xb1h * b1h) - 1) * 100, d1: (xUsd / (xb24 * b24) - 1) * 100, d7: (xUsd / (xb7d * b7d) - 1) * 100 };
+
+  // ratio history
+  const hist = series("1h");
+  const ath = hist.reduce((m, p) => p.ratio > m.ratio ? p : m, hist[0] || { ratio: ratio, time: now });
+  const r24 = hist.length ? (closeAgo(hist.map(p => ({ time: p.time, close: p.ratio })), 86400)) : null;
+  const r7 = hist.length ? (closeAgo(hist.map(p => ({ time: p.time, close: p.ratio })), 7 * 86400)) : null;
+  const rFirst = series("1d")[0];
+
+  // hero
+  $("headline").textContent = `XBT is worth ${ratio.toFixed(2)}% of BTC`;
+  $("subline").innerHTML = `To flip BTC, XBT has to rise <b>${num(mult, 1)}×</b>, to about <b>${flipBtc.toFixed(4)} BTC</b> (${usd(flipBtc * B.usd, 0)}). ` +
+    (r24 != null ? `Over the last 24 hours the gap ${ratio >= r24 ? "<span class=up>narrowed</span>" : "<span class=down>widened</span>"} (${r24.toFixed(2)}% → ${ratio.toFixed(2)}%).` : "");
+  $("fill").style.width = Math.min(100, ratio) + "%";
+  $("scale-mid").textContent = "";
+  $("t-xmc").textContent = big(xmc); $("t-xmc-s").innerHTML = chg(xc.d1) + " 24h";
+  $("t-bmc").textContent = big(bmc); $("t-bmc-s").innerHTML = chg(bc.d1) + " 24h";
+  $("t-flip").textContent = usd(flipBtc * B.usd, 0); $("t-flip-s").textContent = `${flipBtc.toFixed(4)} BTC per XBT, ${num(mult, 1)}× from here`;
+  $("t-ath").textContent = ath.ratio.toFixed(2) + "%"; $("t-ath-s").textContent = "on " + new Date(ath.time * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "numeric" }) + ` (XBT ${(ath.xbtBtc?.close ?? X.btc).toFixed(5)} BTC)`;
+
+  // table
+  const xSpark = hist.filter(p => p.time >= now - 7 * 86400).map(p => p.xbtUsd.close);
+  const bSpark = BH.filter(c => c.time >= now - 7 * 86400).map(c => c.close);
+  const rows = [
+    { name: "Bitcoin", tk: "XBT", algo: "BLAKE2b · BIP-110", color: "var(--xbt)", ic: "X", price: xUsd, sub: btcf(X.btc), c: xc, mc: xmc, vol: X.quoteVolume24h * B.usd, volSub: num(X.volume24h) + " XBT", sup: xs, spark: xSpark },
+    { name: "Bitcoin", tk: "BTC", algo: "SHA-256d", color: "var(--btc)", ic: "B", price: B.usd, sub: "1.000000 BTC", c: bc, mc: bmc, vol: B.volume24h * B.usd, volSub: num(B.volume24h) + " BTC (Coinbase)", sup: bs, spark: bSpark },
+  ].sort((a, b) => b.mc - a.mc);
+  $("rows").innerHTML = rows.map((r, i) => `<tr>
+    <td class="muted">${i + 1}</td>
+    <td><div class="coin"><span class="ic" style="background:${r.color}">${r.ic}</span><div><b>${r.name}</b><span class="tk">${r.tk}</span><span class="algo">${r.algo}</span></div></div></td>
+    <td>${usd(r.price)}<div class="muted" style="font-size:12px">${r.sub}</div></td>
+    <td>${chg(r.c.h1)}</td><td>${chg(r.c.d1)}</td><td>${chg(r.c.d7)}</td>
+    <td>${big(r.mc)}<div class="muted" style="font-size:12px">${(r.mc / (xmc + bmc) * 100).toFixed(2)}% of combined</div></td>
+    <td>${big(r.vol)}<div class="muted" style="font-size:12px">${r.volSub}</div></td>
+    <td>${num(r.sup)} ${r.tk}</td>
+    <td>${spark(r.spark)}</td></tr>`).join("") +
+    `<tr><td class="diff"></td><td class="diff">Difference</td><td class="diff">${(xUsd / B.usd * 100).toFixed(2)}% of BTC</td>
+     <td class="diff">${pct(xc.h1 - bc.h1)}</td><td class="diff">${pct(xc.d1 - bc.d1)}</td><td class="diff">${pct(xc.d7 - bc.d7)}</td>
+     <td class="diff">${big(bmc - xmc)} gap</td><td class="diff">${(X.quoteVolume24h / B.volume24h * 100).toFixed(1)}% of BTC</td>
+     <td class="diff">${xs >= bs ? "+" : ""}${num(xs - bs)}</td><td class="diff"></td></tr>`;
+
+  // head to head
+  const line = (k, a, b, d) => `<tr><td>${k}</td><td>${a}</td><td>${b}</td><td>${d}</td></tr>`;
+  $("cmp").innerHTML = [
+    line("Market cap", big(xmc), big(bmc), ratio.toFixed(2) + "%"),
+    line("Price", usd(xUsd), usd(B.usd), (X.btc * 100).toFixed(2) + "%"),
+    line("24h change", chg(xc.d1), chg(bc.d1), pct(xc.d1 - bc.d1)),
+    line("7d change", chg(xc.d7), chg(bc.d7), pct(xc.d7 - bc.d7)),
+    line("Volume (24h)", big(X.quoteVolume24h * B.usd), big(B.volume24h * B.usd), (X.quoteVolume24h / B.volume24h * 100).toFixed(1) + "%"),
+    line("Volume ÷ market cap", (X.quoteVolume24h * B.usd / xmc * 100).toFixed(2) + "%", (B.volume24h * B.usd / bmc * 100).toFixed(2) + "%", ""),
+    line("Block height", num(X.chain.height), num(B.chain.height), (X.chain.height >= B.chain.height ? "+" : "") + num(X.chain.height - B.chain.height)),
+    line("Blocks since split", num(X.chain.blocksSinceSplit), num(B.chain.blocksSinceSplit), ""),
+    line("Recent block time", X.chain.blockInterval ? ago(X.chain.blockInterval) : "–", B.chain.blockInterval ? ago(B.chain.blockInterval) : "–", "target 10 min"),
+    line("Supply", num(xs), num(bs), (xs >= bs ? "+" : "") + num(xs - bs)),
+  ].join("");
+
+  const rc = (k, from) => from == null ? "" : `<tr><td>${k}</td><td>${from.toFixed(2)}% → ${ratio.toFixed(2)}%</td><td>${chg((ratio / from - 1) * 100)}</td></tr>`;
+  $("ratiochg").innerHTML = rc("Last 24 hours", r24) + rc("Last 7 days", r7) + (rFirst ? rc("Since listing (" + new Date(rFirst.time * 1000).toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" }) + ")", rFirst.ratio) : "");
+
+  whatIf();
+  drawChart();
+}
+
+function spark(vals) {
+  if (vals.length < 2) return "";
+  const w = 140, h = 40, lo = Math.min(...vals), hi = Math.max(...vals), rng = hi - lo || 1;
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 2 - (v - lo) / rng * (h - 4)).toFixed(1)}`).join(" ");
+  const col = vals[vals.length - 1] >= vals[0] ? "var(--up)" : "var(--down)";
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${col}" stroke-width="1.6" points="${pts}"/></svg>`;
+}
+
+function whatIf() {
+  if (!D) return;
+  const p = parseFloat($("whatif").value);
+  if (!(p > 0)) { $("whatif-out").textContent = ""; return; }
+  const B = D.btc, xs = D.xbt.chain.supply, bs = B.chain.supply;
+  const xmc = p * B.usd * xs, r = xmc / (B.usd * bs) * 100;
+  $("whatif-out").innerHTML = `XBT would be <b>${usd(p * B.usd, 0)}</b>, a market cap of <b>${big(xmc)}</b>.<br>
+    That is <b>${r.toFixed(1)}%</b> of BTC, ${num(p / D.xbt.btc, 1)}× today's XBT price.` + (r >= 100 ? ` <span class="up"><b>Flipped.</b></span>` : "");
+}
+
+// ---- chart
+let chart, s1, s2;
+function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function makeChart() {
+  const el = $("chart"); el.innerHTML = "";
+  chart = LightweightCharts.createChart(el, {
+    autoSize: true,
+    layout: { background: { color: "transparent" }, textColor: css("--muted"), fontFamily: "Inter, sans-serif" },
+    grid: { vertLines: { color: css("--line") }, horzLines: { color: css("--line") } },
+    rightPriceScale: { borderColor: css("--line") }, timeScale: { borderColor: css("--line"), timeVisible: true },
+    crosshair: { mode: 0 },
+  });
+}
+function drawChart() {
+  if (!chart) makeChart();
+  if (s1) { chart.removeSeries(s1); s1 = null; } if (s2) { chart.removeSeries(s2); s2 = null; }
+  $("unit").hidden = state.view !== "xbt";
+  const pts = series(state.tf);
+  const xbt = css("--xbt"), btc = css("--btc");
+  let legend = "";
+  chart.applyOptions({ leftPriceScale: { visible: false }, rightPriceScale: { mode: 0 } });
+  if (state.view === "ratio") {
+    s1 = chart.addAreaSeries({ lineColor: xbt, topColor: xbt + "55", bottomColor: xbt + "05", lineWidth: 2, priceFormat: { type: "custom", formatter: v => v.toFixed(2) + "%" } });
+    s1.setData(pts.map(p => ({ time: p.time, value: p.ratio })));
+    legend = `<span><i style="background:${xbt}"></i>XBT market cap as a % of BTC market cap (100% = flipped)</span>`;
+  } else if (state.view === "mcap") {
+    const f = { type: "custom", formatter: v => big(v) };
+    s1 = chart.addLineSeries({ color: btc, lineWidth: 2, priceFormat: f, priceScaleId: "right" });
+    s2 = chart.addLineSeries({ color: xbt, lineWidth: 2, priceFormat: f, priceScaleId: "left" });
+    chart.applyOptions({ leftPriceScale: { visible: true, borderColor: css("--line") } });
+    s1.setData(pts.map(p => ({ time: p.time, value: p.bmc })));
+    s2.setData(pts.map(p => ({ time: p.time, value: p.xmc })));
+    legend = `<span><i style="background:${xbt}"></i>XBT market cap (left scale)</span><span><i style="background:${btc}"></i>BTC market cap (right scale)</span>`;
+  } else if (state.view === "xbt") {
+    const inBtc = state.unit === "btc";
+    s1 = chart.addCandlestickSeries({ upColor: css("--up"), downColor: css("--down"), borderVisible: false, wickUpColor: css("--up"), wickDownColor: css("--down"),
+      priceFormat: inBtc ? { type: "price", precision: 6, minMove: 0.000001 } : { type: "price", precision: 2, minMove: 0.01 } });
+    s1.setData(pts.map(p => { const c = inBtc ? p.xbtBtc : p.xbtUsd; return { time: p.time, open: c.open, high: c.high, low: c.low, close: c.close }; }));
+    legend = `<span>XBT price ${inBtc ? "in BTC (NeoxEX BTCB2/BTC)" : "in USD (XBT/BTC × Coinbase BTC)"}</span>`;
+  } else {
+    const bc = D.candles.btc[state.tf];
+    s1 = chart.addCandlestickSeries({ upColor: css("--up"), downColor: css("--down"), borderVisible: false, wickUpColor: css("--up"), wickDownColor: css("--down") });
+    s1.setData(bc.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
+    legend = `<span>BTC price in USD (Coinbase)</span>`;
+  }
+  $("legend").innerHTML = legend;
+  applyRange();
+}
+function applyRange() {
+  if (!chart) return;
+  if (state.range === "all") { chart.timeScale().fitContent(); return; }
+  const to = Date.now() / 1000, from = to - Number(state.range) * 86400;
+  try { chart.timeScale().setVisibleRange({ from, to }); } catch (e) { chart.timeScale().fitContent(); }
+}
+
+function seg(id, key, attr, after) {
+  $(id).addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    for (const x of $(id).children) x.classList.toggle("on", x === b);
+    state[key] = b.dataset[attr];
+    if (key === "range" && state.range === "1" && state.tf === "1d") { state.tf = "1h"; for (const x of $("tf").children) x.classList.toggle("on", x.dataset.tf === "1h"); }
+    after ? after() : drawChart();
+  });
+}
+seg("view", "view", "v"); seg("tf", "tf", "tf"); seg("unit", "unit", "u"); seg("range", "range", "r", applyRange);
+$("whatif").addEventListener("input", whatIf);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { chart && chart.remove(); chart = null; s1 = s2 = null; D && drawChart(); });
+
+// ---- data loop
+let lastOk = 0;
+async function load() {
+  try {
+    const r = await fetch("/api/data", { cache: "no-store" });
+    const j = await r.json();
+    if (j.error) throw new Error(j.error);
+    const first = !D; D = j; lastOk = Date.now();
+    if (first) render(); else { const keep = chart && chart.timeScale().getVisibleLogicalRange(); render(); if (keep) chart.timeScale().setVisibleLogicalRange(keep); }
+  } catch (e) {
+    if (!D) $("headline").innerHTML = `<span class="err">Couldn't load prices: ${e.message}. Retrying…</span>`;
+  }
+  tick();
+}
+function tick() {
+  if (!lastOk) return;
+  const s = (Date.now() - lastOk) / 1000;
+  $("updated").textContent = `Live · updated ${ago(s)} ago`;
+  $("dot").classList.toggle("stale", s > 120);
+}
+load(); setInterval(load, 30000); setInterval(tick, 5000);
+</script>
+</body>
+</html>
