@@ -3,7 +3,7 @@ const http = require("http"), fs = require("fs"), path = require("path");
 const types = { ".html": "text/html", ".json": "application/json", ".png": "image/png", ".js": "text/javascript", ".webmanifest": "application/manifest+json", ".mp4": "video/mp4", ".jpg": "image/jpeg", ".svg": "image/svg+xml" };
 http.createServer(async (req, res) => {
   const url = req.url.split("?")[0];
-  const route = url.match(/^\/api\/(data|candles|volume|summary)$/);
+  const route = url.match(/^\/api\/(data|candles|volume|summary|top)$/);
   if (route) {
     res.status = (c) => { res.statusCode = c; return res; };
     res.json = (o) => { res.setHeader("Content-Type", "application/json"); res.end(JSON.stringify(o)); };

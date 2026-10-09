@@ -65,6 +65,42 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 600 14px Inter, sans-serif; padding: 9px 14px; border-radius: 9px; cursor: pointer; text-decoration: none; }
 .btn.gold { background: var(--xbt); border-color: var(--xbt); color: #1a1405; }
 
+/* nav */
+.nav { display: flex; gap: 4px; background: var(--chip); padding: 3px; border-radius: 10px; }
+.nav a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px; padding: 7px 14px; border-radius: 8px; }
+.nav a.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+header { flex-wrap: wrap; }
+
+/* exchange rate cards */
+.rates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+.rate { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.rate .k { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.rate .k img { width: 16px; height: 16px; }
+.rate .v { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.rate .s { font-size: 13px; color: var(--muted); }
+.rate .v small { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+
+/* top 100 */
+.rankbar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.rankbar img { width: 48px; height: 48px; }
+.rankbar .big { font-size: clamp(22px, 4vw, 30px); font-weight: 800; letter-spacing: -0.02em; }
+.rankbar .big b { color: var(--xbt); }
+.toptools { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 6px; }
+.toptools input { flex: 1; min-width: 180px; font: 500 15px Inter, sans-serif; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.top100 { min-width: 1080px; }
+.top100 th, .top100 td { padding: 12px 10px; }
+.top100 th:nth-child(-n+2), .top100 td:nth-child(-n+2) { text-align: left; }
+.top100 th:nth-child(1), .top100 td:nth-child(1) { position: sticky; left: 0; background: var(--card); width: 44px; color: var(--muted); z-index: 1; }
+.top100 th:nth-child(2), .top100 td:nth-child(2) { position: sticky; left: 44px; background: var(--card); z-index: 1; }
+.top100 tbody tr:hover td { background: var(--bg); }
+.top100 tr.me td { background: color-mix(in srgb, var(--xbt) 13%, var(--card)); }
+.top100 tr.me td:first-child { box-shadow: inset 3px 0 0 var(--xbt); }
+.top100 tr.flash td { animation: flash 1.6s; }
+@keyframes flash { 0%, 40% { background: color-mix(in srgb, var(--xbt) 40%, var(--card)); } }
+.top100 .coin > img { width: 24px; height: 24px; border-radius: 50%; }
+.top100 .coin .tk { margin-left: 6px; }
+.top100 td { font-variant-numeric: tabular-nums; }
+
 /* hero */
 .hero h1 { font-size: clamp(22px, 4vw, 32px); margin: 0 0 6px; letter-spacing: -0.02em; line-height: 1.2; }
 .hero p { margin: 0; color: var(--muted); font-size: 16px; }
@@ -164,12 +200,13 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
 .err { color: var(--down); font-size: 14px; }
 
 @media (max-width: 860px) {
-  .tiles { grid-template-columns: repeat(2, 1fr); }
+  .tiles, .rates { grid-template-columns: repeat(2, 1fr); }
+  .top100 td:nth-child(2) .tk { display: block; margin-left: 0; }
   .h2h, .share, .explainer, .getit { grid-template-columns: 1fr; }
   #chart { height: 360px; }
 }
 @media (max-width: 420px) {
-  .tile .v { font-size: 19px; }
+  .tile .v, .rate .v { font-size: 18px; }
   .fact .v { font-size: 20px; }
   .facts { grid-template-columns: 1fr; }
   .card { padding: 16px; }
@@ -182,9 +219,11 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
 <div class="wrap">
   <header>
     <div class="brand"><img src="/img/xbt.png" alt=""> The Flippening</div>
+    <nav class="nav" id="nav"><a href="#" data-page="home" class="on">Flippening</a><a href="#top100" data-page="top">Top 100</a></nav>
     <div class="status"><span class="dot" id="dot"></span><span id="updated">Loading…</span></div>
   </header>
 
+  <div id="page-home">
   <section class="card hero">
     <h1 id="headline">Loading live prices…</h1>
     <p id="subline">&nbsp;</p>
@@ -196,6 +235,7 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
       <div class="tile"><div class="k">XBT price to flip ShaT</div><div class="v" id="t-flip">–</div><div class="s" id="t-flip-s">&nbsp;</div></div>
       <div class="tile"><div class="k">Best ratio since listing</div><div class="v" id="t-ath">–</div><div class="s" id="t-ath-s">&nbsp;</div></div>
     </div>
+    <div class="rates" id="rates"></div>
   </section>
 
   <section class="card">
@@ -329,6 +369,28 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
     </div>
   </section>
 
+  </div>
+
+  <div id="page-top" hidden>
+    <section class="card">
+      <div class="rankbar">
+        <img src="/img/xbt.png" alt="">
+        <div><div class="big" id="rank-head">Loading the top 100…</div><div class="muted" id="rank-sub">&nbsp;</div></div>
+      </div>
+      <div class="toptools">
+        <input id="topq" type="search" placeholder="Search coins" aria-label="Search coins">
+        <button class="btn gold" id="jump">Jump to XBT</button>
+      </div>
+      <div class="tablewrap">
+        <table class="top100">
+          <thead><tr><th>#</th><th>Name</th><th>Price</th><th>1h %</th><th>24h %</th><th>7d %</th><th>Market cap</th><th>Volume (24h)</th><th>Circulating supply</th><th>Last 7 days</th></tr></thead>
+          <tbody id="toprows"></tbody>
+        </table>
+      </div>
+      <div class="small" style="margin-top:10px">Top 100 by market cap from <a href="https://www.coingecko.com" target="_blank" rel="noopener" style="color:inherit">CoinGecko</a>, with Bitcoin (XBT) added from NeoxEX. CoinGecko lists ShaT coin as "Bitcoin"; it is shown here as ShaT coin. Updates every 2 minutes.</div>
+    </section>
+  </div>
+
   <footer class="card">
     Bitcoin (XBT) is the BLAKE2b / BIP-110 chain, listed as BTCB2 on NeoxEX. ShaT coin (BTC) is the SHA-256d chain, powered by Tether <img class="teth" src="/img/tether.png" alt="Tether">. The chains split after block 961,631 on 2026-08-08, and XBT switched to BLAKE2b proof of work at block 961,640 on 2026-08-30.
     Before the split both coins share one price history, so the "XBT + Bitcoin history" chart shows Bitcoin's Coinbase price up to the split and NeoxEX trading from 2026-09-01. Between those dates XBT had no market price.
@@ -341,7 +403,7 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
 <script>
 const $ = (id) => document.getElementById(id);
 const ORIGIN = location.origin;
-let D = null, PRE = null, VOL = null;
+let D = null, PRE = null, VOL = null, TOP = null, CUR = null;
 const INTRA = {}; // intraday candles by timeframe
 const save = (k, v) => { try { localStorage.setItem("flip." + k, JSON.stringify(v)); } catch (e) {} };
 const restore = (k, d) => { try { const v = JSON.parse(localStorage.getItem("flip." + k)); return v ?? d; } catch (e) { return d; } };
@@ -514,8 +576,80 @@ function render() {
   const rc = (k, from) => from == null ? "" : `<tr><td>${k}</td><td>${from.toFixed(2)}% → ${ratio.toFixed(2)}%</td><td>${chg((ratio / from - 1) * 100)}</td></tr>`;
   $("ratiochg").innerHTML = rc("Last 24 hours", r24) + rc("Last 7 days", r7) + (rFirst ? rc("Since listing (" + new Date(rFirst.time * 1000).toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" }) + ")", rFirst.ratio) : "");
 
+  CUR = { xUsd, xmc, xc, xVol, xs, xSpark, xbtBtc: X.btc, xbtChg: X.changePct24h };
+  renderRates();
+  if (!$("page-top").hidden) renderTop();
   whatIf();
 }
+
+// four ways to price one coin in the other
+function renderRates() {
+  const p = CUR.xbtBtc, c = CUR.xbtChg, inv = (1 / (1 + c / 100) - 1) * 100;
+  const X = `<img src="/img/xbt.png" alt="">`, S = `<img src="/img/shat.png" alt="">`;
+  const card = (k, v, s, ch) => `<div class="rate"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s} · ${chg(ch)}</div></div>`;
+  $("rates").innerHTML = [
+    card(`${X} XBT : BTC`, p.toFixed(6) + " <small>BTC</small>", "for 1 XBT", c),
+    card(`${S} BTC : XBT`, num(1 / p, 2) + " <small>XBT</small>", "for 1 BTC", inv),
+    card(`${X} 1 XBT in sats`, num(p * 1e8) + " <small>sats</small>", "ShaT sats per XBT", c),
+    card(`${S} 1 BTC in XBT sats`, num(1e8 / p) + " <small>sats</small>", "XBT sats per BTC", inv),
+  ].join("");
+}
+
+// ---- top 100
+const fmtPrice = (v) => v == null ? "–" : v >= 1 ? "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "$" + Number(v.toPrecision(4)).toString();
+const thin = (a, n) => a.length <= n ? a : Array.from({ length: n }, (_, i) => a[Math.round(i * (a.length - 1) / (n - 1))]);
+async function loadTop() {
+  try { const j = await fetch("/api/top").then(r => r.json()); if (j.error) throw new Error(j.error); TOP = j; renderTop(); }
+  catch (e) { if (!TOP) $("rank-head").textContent = "Couldn't load the top 100: " + e.message; }
+}
+function topList() {
+  const list = TOP.coins.map(c => c.id === "bitcoin" ? { ...c, name: "ShaT coin", image: "/img/shat.png", tether: true } : c);
+  if (CUR) list.push({ id: "xbt", symbol: "XBT", name: "Bitcoin", image: "/img/xbt.png", price: CUR.xUsd, marketCap: CUR.xmc, volume: CUR.xVol, supply: CUR.xs,
+    h1: CUR.xc.h1, d1: CUR.xc.d1, d7: CUR.xc.d7, spark: thin(CUR.xSpark, 56), me: true });
+  return list.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0)).map((c, i) => ({ ...c, rank: i + 1 }));
+}
+function renderTop() {
+  if (!TOP) return;
+  const list = topList(), me = list.find(c => c.me);
+  if (me) {
+    const above = list[me.rank - 2], below = list[me.rank];
+    $("rank-head").innerHTML = `Bitcoin (XBT) ranks <b>#${me.rank}</b> by market cap`;
+    $("rank-sub").innerHTML = (above ? `It needs <b>${pct((above.marketCap / me.marketCap - 1) * 100, 1)}</b> to pass ${above.name} (${above.symbol}, ${big(above.marketCap)}) for #${above.rank}. ` : "") +
+      (below ? `Next below: ${below.name} (${below.symbol}, ${big(below.marketCap)}).` : "");
+  }
+  const q = $("topq").value.trim().toLowerCase();
+  const rows = q ? list.filter(c => c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)) : list;
+  $("toprows").innerHTML = rows.map(c => `<tr class="${c.me ? "me" : ""}" id="${c.me ? "row-xbt" : ""}">
+    <td>${c.rank}</td>
+    <td><div class="coin"><img src="${c.image}" alt="" loading="lazy"><div><b>${c.name}</b><span class="tk">${c.symbol}</span>${c.tether ? `<span class="algo">powered by Tether${TETHER}</span>` : c.me ? `<span class="algo">BLAKE2b</span>` : ""}</div></div></td>
+    <td>${fmtPrice(c.price)}</td><td>${chg(c.h1)}</td><td>${chg(c.d1)}</td><td>${chg(c.d7)}</td>
+    <td>${c.marketCap ? "$" + num(c.marketCap) : "–"}</td><td>${c.volume ? "$" + num(c.volume) : "–"}</td>
+    <td>${c.supply ? num(c.supply) + " " + c.symbol : "–"}</td>
+    <td>${sparkFixed(c.spark || [], c.d7)}</td></tr>`).join("") || `<tr><td></td><td colspan="9" class="muted">No coins match "${q}"</td></tr>`;
+}
+// sparkline coloured by the 7-day change, like CoinMarketCap
+function sparkFixed(vals, d7) {
+  if (vals.length < 2) return "";
+  const w = 140, h = 44, lo = Math.min(...vals), hi = Math.max(...vals), rng = hi - lo || 1;
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 2 - (v - lo) / rng * (h - 4)).toFixed(1)}`).join(" ");
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${(d7 ?? 0) >= 0 ? "var(--up)" : "var(--down)"}" stroke-width="1.5" points="${pts}"/></svg>`;
+}
+$("topq").addEventListener("input", renderTop);
+$("jump").addEventListener("click", () => {
+  $("topq").value = ""; renderTop();
+  const r = $("row-xbt"); if (!r) return;
+  r.scrollIntoView({ behavior: "smooth", block: "center" }); r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash");
+});
+
+// ---- pages
+function route() {
+  const top = location.hash === "#top100";
+  $("page-home").hidden = top; $("page-top").hidden = !top;
+  for (const a of $("nav").children) a.classList.toggle("on", a.dataset.page === (top ? "top" : "home"));
+  if (top) { TOP ? renderTop() : loadTop(); }
+}
+addEventListener("hashchange", route);
+setInterval(() => { if (!$("page-top").hidden) loadTop(); }, 120000);
 
 const fact = (k, v, s, sign) => `<div class="fact"><div class="k">${k}</div><div class="v ${sign >= 0 ? "up" : "down"}">${v}</div><div class="s">${s}</div></div>`;
 
@@ -839,7 +973,7 @@ function tick() {
   $("updated").textContent = `Live · updated ${ago(s)} ago`;
   $("dot").classList.toggle("stale", s > 120);
 }
-load(); setInterval(load, 30000); setInterval(tick, 5000); setInterval(loadVolume, 600000);
+route(); load(); setInterval(load, 30000); setInterval(tick, 5000); setInterval(loadVolume, 600000);
 </script>
 </body>
 </html>
