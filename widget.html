@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flippening Widget</title>
+<meta name="description" content="Compact live view: how much of ShaT coin's market cap Bitcoin (XBT) is worth.">
+<meta name="theme-color" content="#0d1117">
+<link rel="manifest" href="/widget.webmanifest">
+<link rel="icon" href="/img/favicon-64.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="XBT/ShaT">
+<meta property="og:title" content="The Flippening widget">
+<meta property="og:image" content="https://the-flippening.vercel.app/api/og">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f8fa; --card: #ffffff; --ink: #0d1421; --muted: #616e85; --line: #eff2f5; --track: #eef0f3;
+  --xbt: #D4AF37; --up: #16c784; --down: #ea3943;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --muted: #8b95a5; --line: #222a35; --track: #222a35; }
+}
+:root[data-theme="dark"] { --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --muted: #8b95a5; --line: #222a35; --track: #222a35; }
+:root[data-theme="light"] { color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.4 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
+body.embed { padding: 0; background: transparent; justify-content: stretch; }
+a.card { display: block; text-decoration: none; color: inherit; width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; }
+body.embed a.card { max-width: none; height: 100%; border-radius: 12px; padding: 12px 14px; }
+.top { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--muted); }
+.top .brand { display: flex; align-items: center; gap: 7px; font-weight: 700; color: var(--ink); }
+.top img { width: 20px; height: 20px; }
+.ratio { display: flex; align-items: baseline; gap: 10px; margin-top: 8px; }
+.ratio b { font-size: 40px; font-weight: 800; letter-spacing: -0.03em; color: var(--xbt); }
+.ratio span { font-size: 14px; color: var(--muted); }
+.bar { height: 10px; background: var(--track); border-radius: 5px; overflow: hidden; margin: 8px 0 4px; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, #b8932a, #f1d375); border-radius: 5px; min-width: 4px; }
+.sub { font-size: 12px; color: var(--muted); }
+.rows { display: grid; gap: 6px; margin-top: 12px; }
+.row { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.row img { width: 22px; height: 22px; }
+.row .p { margin-left: auto; font-weight: 700; }
+.row .c { width: 64px; text-align: right; font-size: 13px; font-weight: 600; }
+.up { color: var(--up); } .down { color: var(--down); }
+svg { display: block; width: 100%; height: 40px; margin-top: 10px; }
+.foot { margin-top: 14px; font-size: 13px; color: var(--muted); text-align: center; }
+.foot a { color: var(--ink); }
+body.embed { overflow: hidden; }
+body.embed .foot, body.embed svg, body.embed .ratio span { display: none; }
+body.embed .ratio { margin-top: 4px; }
+body.embed .ratio b { font-size: 32px; }
+body.embed .rows { margin-top: 8px; gap: 4px; }
+</style>
+</head>
+<body>
+<a class="card" id="card" href="/" target="_top">
+  <div class="top"><span class="brand"><img src="/img/xbt.png" alt="">The Flippening</span><span id="age">Loading…</span></div>
+  <div class="ratio"><b id="ratio">–</b><span>XBT is worth this much of ShaT coin</span></div>
+  <div class="bar"><i id="fill" style="width:0"></i></div>
+  <div class="sub" id="mult">&nbsp;</div>
+  <div class="rows">
+    <div class="row"><img src="/img/xbt.png" alt="">Bitcoin <span class="sub">XBT</span><span class="p" id="xp">–</span><span class="c" id="xc"></span></div>
+    <div class="row"><img src="/img/shat.png" alt="">ShaT coin <span class="sub">BTC</span><span class="p" id="bp">–</span><span class="c" id="bc"></span></div>
+  </div>
+  <svg id="spark" viewBox="0 0 300 40" preserveAspectRatio="none"></svg>
+</a>
+<div class="foot" id="foot">Flippening % over 7 days · tap for the full site<br><span id="install-hint"></span></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+if (q.get("embed")) { document.body.classList.add("embed"); $("card").href = location.origin + "/"; }
+if (q.get("theme")) document.documentElement.dataset.theme = q.get("theme");
+const usd = (v) => "$" + v.toLocaleString("en-US", { maximumFractionDigits: v >= 100 ? 0 : 2 });
+const chg = (el, v) => { el.textContent = (v >= 0 ? "▲ " : "▼ ") + Math.abs(v).toFixed(2) + "%"; el.className = "c " + (v >= 0 ? "up" : "down"); };
+let at = 0;
+async function load() {
+  try {
+    const s = await fetch("/api/summary", { cache: "no-store" }).then(r => r.json());
+    if (s.error) throw new Error(s.error);
+    at = s.at;
+    $("ratio").textContent = s.ratio.toFixed(2) + "%";
+    $("fill").style.width = Math.min(100, s.ratio) + "%";
+    const d = s.ratio - s.ratio24hAgo;
+    $("mult").innerHTML = `${s.flipMultiple.toFixed(1)}× to flip · <span class="${d >= 0 ? "up" : "down"}">${d >= 0 ? "+" : ""}${d.toFixed(2)} pts in 24h</span>`;
+    $("xp").textContent = usd(s.xbt.usd); chg($("xc"), s.xbt.change24h);
+    $("bp").textContent = usd(s.shat.usd); chg($("bc"), s.shat.change24h);
+    const v = s.spark, lo = Math.min(...v), hi = Math.max(...v), r = hi - lo || 1;
+    const pts = v.map((y, i) => `${(i / (v.length - 1) * 300).toFixed(1)},${(38 - (y - lo) / r * 36).toFixed(1)}`).join(" ");
+    $("spark").innerHTML = `<polyline fill="none" stroke="var(--xbt)" stroke-width="2" vector-effect="non-scaling-stroke" points="${pts}"/>`;
+  } catch (e) { if (!at) $("age").textContent = "Offline"; }
+  tick();
+}
+function tick() { if (!at) return; const s = (Date.now() - at) / 1000; $("age").textContent = s < 90 ? "Live" : `${Math.round(s / 60)} min ago`; }
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+if (!standalone && !q.get("embed")) $("install-hint").innerHTML = /iphone|ipad/i.test(navigator.userAgent) ? "Share → Add to Home Screen to keep this on your phone" : "";
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+load(); setInterval(load, 30000); setInterval(tick, 10000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+</script>
+</body>
+</html>
