@@ -1,5 +1,5 @@
 // Offline shell: pages and assets from cache, live numbers from the network (last good copy if offline).
-const VERSION = "flip-v1";
+const VERSION = "flip-v2";
 const SHELL = ["/", "/widget", "/manifest.webmanifest", "/widget.webmanifest", "/img/xbt.png", "/img/shat.png", "/img/tether.png",
   "/img/icon-192.png", "/data/prefork.json", "/media/shatcoin-poster.jpg",
   "https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"];
