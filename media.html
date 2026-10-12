@@ -22,6 +22,8 @@ h2{font-size:16px;margin:0 0 4px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
 .asset{border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center;min-width:0}
 .asset img{width:104px;height:104px;display:block;margin:0 auto 10px}
+.wm-dark{background:#0d1117;border-radius:10px;padding:18px 14px}
+:root[data-theme="light"] .wm-dark, :root:not([data-theme="dark"]) .wm-dark{background:#0d1117}
 .asset .nm{font-weight:700;font-size:14px}
 .dl{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px}
 .dl a{font-size:12px;font-weight:700;text-decoration:none;color:var(--ink);background:var(--chip);
@@ -53,12 +55,43 @@ footer a{color:inherit}
 
 <section class="card">
   <h2>Logos</h2>
-  <div class="muted">SVG is drawn as a real vector, so it stays sharp at any size. PNGs have a transparent
-    background. Everything here is free to use — no permission needed.</div>
+  <div class="muted">The ShaT Coin marks put the Tether logo where the <b>T</b> belongs — that is the joke, and
+    it is the point. SVG is drawn as real shapes so it stays sharp at any size; PNGs have a transparent
+    background. Free to use, no permission needed.</div>
+
   <div class="grid">
+    <div class="asset" style="grid-column:1/-1">
+      <div class="wm-dark"><img src="/brand/shat-wordmark.svg" alt="ShaT Coin wordmark" style="width:min(420px,100%);height:auto"></div>
+      <div class="nm" style="margin-top:12px">ShaT Coin · wordmark</div>
+      <div class="muted">The full lockup. Two versions: white "Coin" for dark backgrounds, near-black for light.</div>
+      <div class="dl">
+        <a href="/brand/shat-wordmark.svg" download>SVG (dark bg)</a>
+        <a href="/brand/shat-wordmark-dark.svg" download>SVG (light bg)</a>
+        <a href="/brand/shat-wordmark-1600.png" download>PNG 1600</a>
+        <a href="/brand/shat-wordmark-800.png" download>800</a>
+        <a href="/brand/shat-wordmark-400.png" download>400</a>
+      </div>
+      <div class="dl" style="margin-top:4px">
+        <a href="/brand/shat-wordmark-dark-1600.png" download>PNG 1600 (light bg)</a>
+        <a href="/brand/shat-wordmark-dark-800.png" download>800</a>
+        <a href="/brand/shat-wordmark-dark-400.png" download>400</a>
+      </div>
+    </div>
+
     <div class="asset">
-      <img src="/brand/shat.svg" alt="ShaT Coin logo">
-      <div class="nm">ShaT Coin</div><div class="muted">SHA-256d chain</div>
+      <img src="/brand/shat-tether.svg" alt="ShaT Coin icon">
+      <div class="nm">ShaT Coin · icon</div><div class="muted">coin and diamond, for avatars and favicons</div>
+      <div class="dl">
+        <a href="/brand/shat-tether.svg" download>SVG</a>
+        <a href="/brand/shat-tether-512.png" download>512</a>
+        <a href="/brand/shat-tether-256.png" download>256</a>
+        <a href="/brand/shat-tether-128.png" download>128</a>
+        <a href="/brand/shat-tether-64.png" download>64</a>
+      </div>
+    </div>
+    <div class="asset">
+      <img src="/brand/shat.svg" alt="ShaT Coin plain">
+      <div class="nm">ShaT Coin · plain</div><div class="muted">no Tether, where the joke would not land</div>
       <div class="dl">
         <a href="/brand/shat.svg" download>SVG</a>
         <a href="/brand/shat-1024.png" download>1024</a>
@@ -69,7 +102,7 @@ footer a{color:inherit}
       </div>
     </div>
     <div class="asset">
-      <img src="/brand/xbt.svg" alt="Bitcoin XBT logo">
+      <img src="/brand/xbt.svg" alt="Bitcoin XBT">
       <div class="nm">Bitcoin (XBT)</div><div class="muted">BLAKE2b / BIP-110 chain</div>
       <div class="dl">
         <a href="/brand/xbt.svg" download>SVG</a>
@@ -81,17 +114,19 @@ footer a{color:inherit}
       </div>
     </div>
   </div>
+
   <h2 style="margin-top:20px">Colours</h2>
   <div class="swatch">
     <div class="sw"><i style="background:#F7931A"></i><b>#F7931A</b><span>ShaT orange</span></div>
+    <div class="sw"><i style="background:#009393"></i><b>#009393</b><span>Tether teal</span></div>
     <div class="sw"><i style="background:linear-gradient(#FFEC9A,#D4AF37)"></i><b>#D4AF37</b><span>XBT gold</span></div>
     <div class="sw"><i style="background:#0d1117"></i><b>#0d1117</b><span>page, dark</span></div>
-    <div class="sw"><i style="background:#f7f8fa"></i><b>#f7f8fa</b><span>page, light</span></div>
   </div>
   <ul class="rules">
     <li>Write it <b>ShaT Coin</b> — capital S, capital T, capital C.</li>
-    <li>The Tether mark is Tether's, not ours; it is not in this kit.</li>
-    <li>Recolouring or stretching the marks is fine if it reads clearly.</li>
+    <li>The diamond stands in for the T. Do not set the T as a letter as well.</li>
+    <li>Recolouring or stretching is fine as long as it still reads.</li>
+    <li>The Tether diamond on its own belongs to Tether. It is here only as part of this mark.</li>
   </ul>
 </section>
 
