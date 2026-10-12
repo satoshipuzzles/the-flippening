@@ -46,6 +46,14 @@
 }
 :root[data-theme="light"] { color-scheme: light; }
 * { box-sizing: border-box; }
+/* Embedded in someone else's page: drop our chrome, keep the table. */
+body.embed .site-head, body.embed footer, body.embed .nav, body.embed #page-home { display: none !important; }
+body.embed { background: transparent; }
+body.embed .wrap { padding: 0; }
+body.embed .card { border-radius: 12px; margin: 0; }
+body.embed .embed-by { display: block; }
+.embed-by { display: none; text-align: right; font-size: 11.5px; padding: 7px 4px 0; }
+.embed-by a { color: var(--muted); text-decoration: none; font-weight: 700; }
 [hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 .wrap { max-width: 1180px; margin: 0 auto; padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
@@ -251,7 +259,7 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <header class="site-head">
     <div class="brand"><img src="/img/xbt.png" alt=""> The Flippening</div>
     <nav class="nav" id="nav"><a href="#" data-page="home" class="on">Flippening</a><a href="#top100" data-page="top">Top 100</a></nav>
     <div class="status"><span class="dot" id="dot"></span><span id="updated">Loading…</span></div>
@@ -274,8 +282,13 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
   <section class="card">
     <div class="explainer">
       <div class="vid">
-        <video id="vid" src="/media/shatcoin.mp4?v=4" poster="/media/shatcoin-poster.jpg?v=4" autoplay muted loop playsinline preload="metadata" controls></video>
+        <video id="vid" src="/media/shatcoin.mp4?v=5" poster="/media/shatcoin-poster.jpg?v=4" autoplay muted loop playsinline preload="metadata" controls></video>
         <button class="btn sound" id="sound">🔊 Sound on</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <a class="btn" href="/media/shatcoin.mp4" download="the-flippening.mp4">Download video</a>
+        <button class="btn" id="share-vid">Share video</button>
+        <a class="btn" href="/media">Media kit</a>
       </div>
       <div>
         <div class="name"><span class="s">ShaT</span> Coin</div>
@@ -421,6 +434,7 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
           <tbody id="toprows"></tbody>
         </table>
       </div>
+      <div class="embed-by"><a href="/" target="_blank" rel="noopener">the-flippening.vercel.app ↗</a></div>
       <div class="small" style="margin-top:10px">Top 100 by market cap from <a href="https://www.coingecko.com" target="_blank" rel="noopener" style="color:inherit">CoinGecko</a>, with Bitcoin (XBT) added from NeoxEX. CoinGecko lists ShaT Coin as "Bitcoin"; it is shown here as ShaT Coin. Updates every 2 minutes.</div>
     </section>
   </div>
@@ -431,6 +445,11 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
     XBT's price comes from the NeoxEX BTCB2/BTC order book, converted to dollars at the Coinbase BTC price. ShaT's 24-hour volume is across all exchanges (CoinGecko); per-candle ShaT volume is Coinbase.
     Circulating supply counts every coin issued up to each chain's current block height, so lost coins and unclaimed rewards are included. Chain heights come from mempool.guide (XBT) and mempool.space (ShaT).
     The page refreshes every 30 seconds.
+    <div style="margin-top:10px">
+      <a href="/media" style="color:inherit;font-weight:700">Media kit &amp; embeds</a> ·
+      Open source —
+      <a href="https://github.com/satoshipuzzles/the-flippening" target="_blank" rel="noopener" style="color:inherit;font-weight:700">github.com/satoshipuzzles/the-flippening</a>
+    </div>
   </footer>
 </div>
 
@@ -692,8 +711,17 @@ $("jump").addEventListener("click", () => {
 });
 
 // ---- pages
+// /top-embed (or ?embed=1) serves this same page with the chrome hidden, so an
+// embedded table is literally the same code as the one on the site.
+const QS = new URLSearchParams(location.search);
+const EMBED = QS.get("embed") === "1" || location.pathname.replace(/\/$/, "") === "/top-embed";
+if (EMBED) {
+  document.body.classList.add("embed");
+  const t = QS.get("theme");
+  if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+}
 function route() {
-  const top = location.hash === "#top100";
+  const top = EMBED || location.hash === "#top100";
   $("page-home").hidden = top; $("page-top").hidden = !top;
   for (const a of $("nav").children) a.classList.toggle("on", a.dataset.page === (top ? "top" : "home"));
   if (top) { TOP ? renderTop() : loadTop(); }
@@ -975,6 +1003,18 @@ async function shareLink(text) {
   try { await navigator.clipboard.writeText(`${text} ${data.url}`); toast("Link copied"); } catch (e) {}
 }
 $("share-video").addEventListener("click", () => shareLink("Why is it called ShaT Coin? SHA-256 + Tether. Watch XBT vs ShaT live:"));
+
+// Share the file itself where the browser allows it, so it arrives as a video
+// rather than a link; fall back to the link, then to the clipboard.
+$("share-vid").addEventListener("click", async () => {
+  const url = ORIGIN + "/media/shatcoin.mp4";
+  try {
+    const f = new File([await (await fetch(url)).blob()], "the-flippening.mp4", { type: "video/mp4" });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) return navigator.share({ files: [f], title: "The Flippening" });
+  } catch (e) {}
+  if (navigator.share) { try { return await navigator.share({ title: "The Flippening", url }); } catch (e) { return; } }
+  try { await navigator.clipboard.writeText(url); toast("Video link copied"); } catch (e) {}
+});
 
 // ---- install, widget, embed
 let deferred = null;
