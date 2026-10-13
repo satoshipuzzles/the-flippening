@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Flippening</title>
+<meta name="description" content="Bitcoin (XBT) vs ShaT Coin (BTC): live market caps, prices, volume and how close XBT is to flipping ShaT Coin.">
+<meta name="theme-color" content="#0d1117">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/img/favicon-64.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Flippening">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Flippening">
+<meta property="og:title" content="The Flippening: Bitcoin (XBT) vs ShaT Coin (BTC)">
+<meta property="og:description" content="Live market caps, prices and volume. How close is XBT to flipping ShaT Coin?">
+<meta property="og:url" content="https://the-flippening.vercel.app/">
+<meta property="og:image" content="https://the-flippening.vercel.app/api/og">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Flippening: Bitcoin (XBT) vs ShaT Coin (BTC)">
+<meta name="twitter:description" content="Live market caps, prices and volume. How close is XBT to flipping ShaT Coin?">
+<meta name="twitter:image" content="https://the-flippening.vercel.app/api/og">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+:root {
+  --bg: #f7f8fa; --card: #ffffff; --ink: #0d1421; --muted: #616e85; --line: #eff2f5;
+  --xbt: #D4AF37; --btc: #6b7a90; --tether: #26A17B; --up: #16c784; --down: #ea3943;
+  --track: #eef0f3; --chip: #eff2f5;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --muted: #8b95a5; --line: #222a35;
+    --btc: #8d9bb0; --track: #222a35; --chip: #222a35;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --muted: #8b95a5; --line: #222a35;
+  --btc: #8d9bb0; --track: #222a35; --chip: #222a35;
+}
+:root[data-theme="light"] { color-scheme: light; }
+* { box-sizing: border-box; }
+/* Embedded in someone else's page: drop our chrome, keep the table. */
+body.embed .site-head, body.embed footer, body.embed .nav, body.embed #page-home { display: none !important; }
+body.embed { background: transparent; }
+body.embed .wrap { padding: 0; }
+body.embed .card { border-radius: 12px; margin: 0; }
+body.embed .embed-by { display: block; }
+.embed-by { display: none; text-align: right; font-size: 11.5px; padding: 7px 4px 0; }
+.embed-by a { color: var(--muted); text-decoration: none; font-weight: 700; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+.brand img { width: 32px; height: 32px; }
+.status { color: var(--muted); font-size: 13px; text-align: right; }
+.status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--up); margin-right: 6px; vertical-align: 1px; }
+.status .dot.stale { background: var(--down); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -0.01em; }
+h3 { font-size: 15px; margin: 0 0 6px; }
+.muted { color: var(--muted); }
+.up { color: var(--up); } .down { color: var(--down); }
+.small { font-size: 12px; color: var(--muted); }
+.teth { width: 15px; height: 15px; vertical-align: -3px; margin-left: 3px; }
+img.tT { height: 0.86em; width: auto; vertical-align: -0.06em; margin: 0 0.04em 0 0.02em; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 600 14px Inter, sans-serif; padding: 9px 14px; border-radius: 9px; cursor: pointer; text-decoration: none; }
+.btn.gold { background: var(--xbt); border-color: var(--xbt); color: #1a1405; }
+
+/* nav */
+.nav { display: flex; gap: 4px; background: var(--chip); padding: 3px; border-radius: 10px; }
+.nav a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px; padding: 7px 14px; border-radius: 8px; }
+.nav a.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+header { flex-wrap: wrap; }
+
+/* exchange rate cards */
+.rates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+.rate { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.rate .k { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.rate .k img { width: 16px; height: 16px; }
+.rate .v { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.rate .s { font-size: 13px; color: var(--muted); }
+.rate .v small { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+
+/* top 100 */
+.rankbar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.rankbar img { width: 48px; height: 48px; }
+.rankbar .big { font-size: clamp(22px, 4vw, 30px); font-weight: 800; letter-spacing: -0.02em; }
+.rankbar .big b { color: var(--xbt); }
+.toptools { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 6px; }
+.toptools input { flex: 1; min-width: 180px; font: 500 16px Inter, sans-serif; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.top100 { min-width: 1080px; }
+.top100 th, .top100 td { padding: 12px 10px; }
+.top100 th:nth-child(-n+2), .top100 td:nth-child(-n+2) { text-align: left; }
+.top100 th:nth-child(1), .top100 td:nth-child(1) { position: sticky; left: 0; background: var(--card); width: 44px; color: var(--muted); z-index: 1; }
+.top100 th:nth-child(2), .top100 td:nth-child(2) { position: sticky; left: 44px; background: var(--card); z-index: 1; }
+.top100 tbody tr:hover td { background: var(--bg); }
+.top100 tr.me td { background: color-mix(in srgb, var(--xbt) 13%, var(--card)); }
+.top100 tr.me td:first-child { box-shadow: inset 3px 0 0 var(--xbt); }
+.top100 tr.flash td { animation: flash 1.6s; }
+@keyframes flash { 0%, 40% { background: color-mix(in srgb, var(--xbt) 40%, var(--card)); } }
+.top100 .coin > img { width: 24px; height: 24px; border-radius: 50%; }
+.top100 .coin .tk { margin-left: 6px; }
+.top100 td { font-variant-numeric: tabular-nums; }
+
+/* hero */
+.hero h1 { font-size: clamp(22px, 4vw, 32px); margin: 0 0 6px; letter-spacing: -0.02em; line-height: 1.2; }
+.hero p { margin: 0; color: var(--muted); font-size: 16px; }
+.bar { position: relative; height: 18px; background: var(--track); border-radius: 9px; margin: 18px 0 8px; overflow: hidden; }
+.bar .fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #b8932a, #f1d375); border-radius: 9px; min-width: 6px; transition: width .6s; }
+.bar-scale { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
+.tile { background: var(--bg); border-radius: 10px; padding: 12px 14px; }
+.tile .k { font-size: 13px; color: var(--muted); }
+.tile .v { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.tile .s { font-size: 13px; color: var(--muted); }
+
+/* table */
+.tablewrap { overflow-x: auto; margin: 0 -20px; padding: 0 20px; }
+table { width: 100%; border-collapse: collapse; }
+.market { min-width: 960px; }
+th, td { padding: 14px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 13px; font-weight: 600; color: var(--muted); }
+.market th:nth-child(-n+2), .market td:nth-child(-n+2) { text-align: left; }
+tbody tr:last-child td { border-bottom: 0; }
+td { font-weight: 500; }
+.coin { display: flex; align-items: center; gap: 10px; }
+.coin > img { width: 30px; height: 30px; flex: none; }
+.coin b { font-weight: 700; }
+.coin .tk { color: var(--muted); font-size: 13px; margin-left: 4px; font-weight: 600; }
+.coin .algo { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+td.diff { background: var(--bg); color: var(--muted); font-size: 13px; }
+svg.spark { display: block; margin-left: auto; }
+
+/* video */
+.explainer { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; align-items: center; }
+.vid { position: relative; border-radius: 12px; overflow: hidden; background: #0b0f16; aspect-ratio: 16 / 9; }
+.vid video { width: 100%; height: 100%; display: block; }
+.vid .sound { position: absolute; right: 12px; top: 12px; }
+.explainer p { margin: 0 0 10px; color: var(--muted); }
+.name { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+.name .s { color: #F7931A; }
+
+/* share */
+.share { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: center; }
+.donut { position: relative; width: 220px; height: 220px; margin: 0 auto; }
+.donut .center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.donut .center b { font-size: 28px; letter-spacing: -0.02em; }
+.donut .center span { font-size: 13px; color: var(--muted); }
+.keys { display: grid; gap: 8px; margin-top: 14px; }
+.keys div { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.keys i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.keys span { margin-left: auto; font-weight: 600; white-space: nowrap; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fact { background: var(--bg); border-radius: 10px; padding: 14px; }
+.fact .k { font-size: 13px; color: var(--muted); }
+.fact .v { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+.fact .s { font-size: 13px; color: var(--muted); }
+
+/* chart */
+.chartcard:fullscreen, .chartcard.pseudofs { border-radius: 0; margin: 0; overflow: auto; display: flex; flex-direction: column; }
+.chartcard.pseudofs { position: fixed; inset: 0; z-index: 50; padding-top: max(20px, env(safe-area-inset-top)); }
+.chartcard:fullscreen .chartwrap, .chartcard.pseudofs .chartwrap { flex: 1; display: flex; flex-direction: column; }
+.chartcard:fullscreen #chart, .chartcard.pseudofs #chart { flex: 1; height: auto; min-height: 300px; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin: -6px -4px 12px; padding-bottom: 10px; }
+.tabs button { border: 0; background: transparent; color: var(--muted); font: 700 14px Inter, sans-serif; padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+.tabs button.on { background: var(--chip); color: var(--ink); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; align-items: center; }
+.seg { display: inline-flex; background: var(--chip); border-radius: 9px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; color: var(--muted); font: 600 13px Inter, sans-serif; padding: 6px 10px; border-radius: 7px; cursor: pointer; min-width: 34px; }
+.seg button.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.seg button:disabled { opacity: .35; cursor: default; }
+.toolbar .spacer { flex: 1; }
+.chartwrap { position: relative; }
+#chart { height: 460px; }
+.readout { position: absolute; left: 8px; top: 6px; z-index: 3; font-size: 12px; color: var(--muted); pointer-events: none; display: flex; gap: 10px; flex-wrap: wrap; background: color-mix(in srgb, var(--card) 80%, transparent); padding: 2px 6px; border-radius: 6px; }
+.readout b { color: var(--ink); font-weight: 600; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); z-index: 4; pointer-events: none; }
+.rangebar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.legend { display: flex; gap: 16px; font-size: 13px; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+/* head to head */
+.h2h { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cmp td, .cmp th { padding: 11px 6px; }
+.cmp td:first-child { color: var(--muted); font-weight: 500; text-align: left; white-space: normal; }
+.cmp th:first-child { text-align: left; }
+.calc label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.calc input { width: 100%; font: 600 18px Inter, sans-serif; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.calc .out { margin-top: 14px; font-size: 16px; }
+.calc .out b { font-size: 22px; }
+
+/* get it */
+.getit { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.getit .box { background: var(--bg); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.getit p, .getit ol { margin: 0; color: var(--muted); font-size: 14px; }
+.getit ol { padding-left: 18px; }
+.getit a { color: var(--ink); }
+.getit iframe { border: 0; width: 100%; height: 190px; border-radius: 12px; }
+code.snip { display: block; font-size: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px; word-break: break-all; color: var(--ink); }
+footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.err { color: var(--down); font-size: 14px; }
+
+@media (max-width: 860px) {
+  .tiles, .rates { grid-template-columns: repeat(2, 1fr); }
+  /* phones: one-line scrolling control rows, bigger tap targets */
+  .tabs, .toolbar, #range { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar, .toolbar::-webkit-scrollbar, #range::-webkit-scrollbar { display: none; }
+  .tabs button, .seg button { white-space: nowrap; flex: none; }
+  .seg { flex-wrap: nowrap; flex: none; }
+  .toolbar .spacer { display: none; }
+  .seg button { padding: 8px 11px; }
+  .tabs button { padding: 9px 12px; }
+  .h2h > *, .share > *, .explainer > *, .getit > * { min-width: 0; }
+  header { padding: 12px 0; }
+  .nav { order: 3; width: 100%; }
+  .nav a { flex: 1; text-align: center; }
+  .top100 td:nth-child(2) .tk { display: block; margin-left: 0; }
+  .h2h, .share, .explainer, .getit { grid-template-columns: 1fr; }
+  #chart { height: 360px; }
+}
+/* phones: CoinMarketCap-app style tables, # · coin · price · 24h · market cap */
+.short, .m-only { display: none; }
+@media (max-width: 640px) {
+  .market, .top100 { min-width: 0; table-layout: auto; }
+  .market th:nth-child(n+4), .market td:nth-child(n+4), .top100 th:nth-child(n+4), .top100 td:nth-child(n+4) { display: none; }
+  .m-only { display: block !important; }
+  .coin .algo { display: none; }
+  .market td:nth-child(3), .top100 td:nth-child(3) { white-space: nowrap; }
+  .market th, .market td, .top100 th, .top100 td { padding: 12px 5px; font-size: 14px; }
+  .market td:first-child, .market th:first-child, .top100 td:first-child, .top100 th:first-child { padding-left: 0; width: 22px; }
+  .market td:nth-child(2), .top100 td:nth-child(2) { white-space: normal; }
+  .top100 th:nth-child(1), .top100 td:nth-child(1), .top100 th:nth-child(2), .top100 td:nth-child(2) { position: static; }
+  .coin { gap: 8px; }
+  .coin .tk { display: block; margin-left: 0 !important; font-size: 12px; }
+  .coin .algo { font-size: 11px; }
+  .market .small { font-size: 11px; }
+  .full { display: none; } .short { display: inline; }
+  .tablewrap { margin: 0; padding: 0; overflow-x: visible; }
+  .cmp td, .cmp th { white-space: normal; font-size: 14px; padding: 10px 4px; }
+  .market td.diff:nth-child(2) { white-space: nowrap; }
+}
+@media (max-width: 420px) {
+  .tile .v, .rate .v { font-size: 18px; }
+  .fact .v { font-size: 20px; }
+  .facts { grid-template-columns: 1fr; }
+  .card { padding: 16px; }
+  .tablewrap { margin: 0 -16px; padding: 0 16px; }
+  .seg button { padding: 6px 8px; min-width: 30px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site-head">
+    <div class="brand"><img src="/img/xbt.png" alt=""> The Flippening</div>
+    <nav class="nav" id="nav"><a href="#" data-page="home" class="on">Flippening</a><a href="#top100" data-page="top">Top 100</a></nav>
+    <div class="status"><span class="dot" id="dot"></span><span id="updated">Loading…</span></div>
+  </header>
+
+  <div id="page-home">
+  <section class="card">
+    <h2>Market caps</h2>
+    <div class="tablewrap">
+      <table class="market">
+        <thead><tr>
+          <th>#</th><th>Coin</th><th>Price</th><th>1h</th><th>24h</th><th>7d</th><th>This year</th>
+          <th>Market cap</th><th>Volume (24h)</th><th>Circulating supply</th><th>Last 7 days</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="explainer">
+      <div class="vid">
+        <video id="vid" src="/media/shatcoin.mp4?v=6" poster="/media/shatcoin-poster.jpg?v=4" autoplay muted loop playsinline preload="metadata" controls></video>
+        <button class="btn sound" id="sound">🔊 Sound on</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <a class="btn" href="/media/shatcoin.mp4" download="the-flippening.mp4">Download video</a>
+        <button class="btn" id="share-vid">Share video</button>
+        <a class="btn" href="/media">Media kit</a>
+      </div>
+      <div>
+        <div class="name"><span class="s">ShaT</span> Coin</div>
+        <p>When Bitcoin split on August 8, 2026, one chain enforced BIP-110 against spam and moved its mining to BLAKE2b. That chain is Bitcoin (XBT).</p>
+        <p>The other kept <b>SHA</b>-256d mining, powered by <b>T</b>ether <img class="teth" src="/img/tether.png" alt="Tether">. SHA plus Tether: ShaT Coin.</p>
+        <button class="btn" id="share-video">Share this</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card hero">
+    <h1 id="headline">Loading live prices…</h1>
+    <p id="subline">&nbsp;</p>
+    <div class="bar"><div class="fill" id="fill" style="width:0"></div></div>
+    <div class="bar-scale"><span>0%</span><span>100% = XBT flips ShaT Coin</span></div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Bitcoin (XBT) market cap</div><div class="v" id="t-xmc">–</div><div class="s" id="t-xmc-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">ShaT Coin (BTC) market cap</div><div class="v" id="t-bmc">–</div><div class="s" id="t-bmc-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">XBT price to flip ShaT</div><div class="v" id="t-flip">–</div><div class="s" id="t-flip-s">&nbsp;</div></div>
+      <div class="tile"><div class="k">Best ratio since listing</div><div class="v" id="t-ath">–</div><div class="s" id="t-ath-s">&nbsp;</div></div>
+    </div>
+    <div class="rates" id="rates"></div>
+  </section>
+
+  <section class="card">
+    <h2>Market share</h2>
+    <div class="share">
+      <div>
+        <div class="donut"><svg id="donut" viewBox="0 0 220 220" width="220" height="220"></svg>
+          <div class="center"><b id="donut-pct">–</b><span>Bitcoin (XBT)</span></div></div>
+        <div class="keys" id="keys"></div>
+      </div>
+      <div class="facts" id="facts"></div>
+    </div>
+  </section>
+
+  <section class="card chartcard" id="chartcard">
+    <div class="tabs" id="view">
+      <button data-v="ratio" class="on">Flippening %</button>
+      <button data-v="mcap">Market caps</button>
+      <button data-v="vol">Volume</button>
+      <button data-v="xbt">XBT</button>
+      <button data-v="xbth">XBT + Bitcoin history</button>
+      <button data-v="btc">ShaT</button>
+    </div>
+    <div class="toolbar">
+      <div class="seg" id="tf">
+        <button data-tf="1m">1m</button><button data-tf="5m">5m</button><button data-tf="15m">15m</button>
+        <button data-tf="1h" class="on">1h</button><button data-tf="4h">4h</button><button data-tf="1d">1D</button><button data-tf="1w">1W</button>
+      </div>
+      <div class="seg" id="type">
+        <button data-t="candle" class="on">Candles</button><button data-t="bar">Bars</button>
+        <button data-t="line">Line</button><button data-t="area">Area</button>
+      </div>
+      <div class="seg" id="unit"></div>
+      <div class="seg" id="scale">
+        <button data-s="0" class="on" title="Linear scale">Lin</button><button data-s="1" title="Log scale">Log</button><button data-s="2" title="Percent change">%</button>
+      </div>
+      <div class="seg" id="ind">
+        <button data-i="ma20">MA 20</button><button data-i="ma50">MA 50</button><button data-i="ma200">MA 200</button><button data-i="vol">Vol</button>
+      </div>
+      <span class="spacer"></span>
+      <div class="seg"><button id="fs" title="Full screen">⤢ Full screen</button></div>
+    </div>
+    <div class="chartwrap">
+      <div class="readout" id="readout"></div>
+      <div class="loading" id="loading" hidden>Loading candles…</div>
+      <div id="chart"></div>
+    </div>
+    <div class="rangebar">
+      <div class="seg" id="range">
+        <button data-r="1D">1D</button><button data-r="5D">5D</button><button data-r="1M">1M</button><button data-r="3M">3M</button>
+        <button data-r="6M">6M</button><button data-r="YTD">YTD</button><button data-r="1Y">1Y</button><button data-r="5Y">5Y</button><button data-r="All" class="on">All</button>
+      </div>
+      <span class="small">Scroll or pinch to zoom · drag to pan · times in UTC</span>
+    </div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="h2h">
+    <div class="card">
+      <h2>Head to head</h2>
+      <table class="cmp">
+        <thead><tr><th></th><th>XBT</th><th>ShaT</th><th>Difference</th></tr></thead>
+        <tbody id="cmp"></tbody>
+      </table>
+    </div>
+    <div class="card calc">
+      <h2>What if?</h2>
+      <label for="whatif">XBT price in BTC</label>
+      <input id="whatif" type="number" step="0.001" min="0" value="0.1">
+      <div class="out" id="whatif-out"></div>
+      <h2 style="margin-top:24px">Ratio change</h2>
+      <table class="cmp"><tbody id="ratiochg"></tbody></table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Put it on your phone</h2>
+    <div class="getit">
+      <div class="box">
+        <h3>Install the app</h3>
+        <p id="install-text">Works offline and opens full screen, like a native app.</p>
+        <ol id="ios-steps" hidden><li>Tap the Share button in Safari</li><li>Choose <b>Add to Home Screen</b></li></ol>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn gold" id="install" hidden>Install app</button>
+          <a class="btn" href="/widget">Open widget view</a>
+        </div>
+      </div>
+      <div class="box">
+        <h3>iPhone home screen widget</h3>
+        <ol>
+          <li>Install <a href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener">Scriptable</a> (free)</li>
+          <li>Tap <b>Copy widget script</b>, make a new script in Scriptable and paste it</li>
+          <li>Long-press your home screen, add a Scriptable widget, and pick the script</li>
+        </ol>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn gold" id="copy-script">Copy widget script</button><a class="btn" href="/scriptable.js" target="_blank">View script</a></div>
+      </div>
+      <div class="box">
+        <h3>Embed on your site</h3>
+        <iframe src="/widget?embed=1" title="Flippening widget" loading="lazy"></iframe>
+        <code class="snip" id="embed-code"></code>
+        <button class="btn" id="copy-embed">Copy embed code</button>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+  <div id="page-top" hidden>
+    <section class="card">
+      <div class="rankbar">
+        <img src="/img/xbt.png" alt="">
+        <div><div class="big" id="rank-head">Loading the top 100…</div><div class="muted" id="rank-sub">&nbsp;</div></div>
+      </div>
+      <div class="toptools">
+        <input id="topq" type="search" placeholder="Search coins" aria-label="Search coins">
+        <button class="btn gold" id="jump">Jump to XBT</button>
+      </div>
+      <div class="tablewrap">
+        <table class="top100">
+          <thead><tr><th>#</th><th>Name</th><th>Price</th><th>1h %</th><th>24h %</th><th>7d %</th><th>Market cap</th><th>Volume (24h)</th><th>Circulating supply</th><th>Last 7 days</th></tr></thead>
+          <tbody id="toprows"></tbody>
+        </table>
+      </div>
+      <div class="embed-by"><a href="/" target="_blank" rel="noopener">the-flippening.vercel.app ↗</a></div>
+      <div class="small" style="margin-top:10px">Top 100 by market cap from <a href="https://www.coingecko.com" target="_blank" rel="noopener" style="color:inherit">CoinGecko</a>, with Bitcoin (XBT) added from NeoxEX. CoinGecko lists ShaT Coin as "Bitcoin"; it is shown here as ShaT Coin. Updates every 2 minutes.</div>
+    </section>
+  </div>
+
+  <footer class="card">
+    Bitcoin (XBT) is the BLAKE2b / BIP-110 chain, listed as BTCB2 on NeoxEX. ShaT Coin (BTC) is the SHA-256d chain, powered by Tether <img class="teth" src="/img/tether.png" alt="Tether">. The chains split after block 961,631 on 2026-08-08, and XBT switched to BLAKE2b proof of work at block 961,640 on 2026-08-30.
+    Before the split both coins share one price history, so the "XBT + Bitcoin history" chart shows Bitcoin's Coinbase price up to the split and NeoxEX trading from 2026-09-01. Between those dates XBT had no market price.
+    XBT's price comes from the NeoxEX BTCB2/BTC order book, converted to dollars at the Coinbase BTC price. ShaT's 24-hour volume is across all exchanges (CoinGecko); per-candle ShaT volume is Coinbase.
+    Circulating supply counts every coin issued up to each chain's current block height, so lost coins and unclaimed rewards are included. Chain heights come from mempool.guide (XBT) and mempool.space (ShaT).
+    The page refreshes every 30 seconds.
+    <div style="margin-top:10px">
+      <a href="/media" style="color:inherit;font-weight:700">Media kit &amp; embeds</a> ·
+      Open source —
+      <a href="https://github.com/satoshipuzzles/the-flippening" target="_blank" rel="noopener" style="color:inherit;font-weight:700">github.com/satoshipuzzles/the-flippening</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const ORIGIN = location.origin;
+let D = null, PRE = null, VOL = null, TOP = null, CUR = null;
+const INTRA = {}; // intraday candles by timeframe
+const save = (k, v) => { try { localStorage.setItem("flip." + k, JSON.stringify(v)); } catch (e) {} };
+const restore = (k, d) => { try { const v = JSON.parse(localStorage.getItem("flip." + k)); return v ?? d; } catch (e) { return d; } };
+const state = Object.assign({ view: "ratio", tf: "1h", type: "candle", scale: "0", range: "All", xunit: "usd", vunit: "24h", vscale: "1", ind: { vol: true } }, restore("state", {}));
+const TETHER = `<img class="teth" src="/img/tether.png" alt="Tether">`;
+// "ShaT" is written with the Tether logo as its T wherever it shows on screen
+function decorate(root = document.body) {
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) =>
+    n.nodeValue.includes("ShaT") && !n.parentElement.closest("script,style,title,svg,code,textarea") ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+  const hits = []; while (w.nextNode()) hits.push(w.currentNode);
+  for (const n of hits) {
+    const frag = document.createDocumentFragment();
+    n.nodeValue.split("ShaT").forEach((part, i) => {
+      if (i) { frag.append("Sha"); const im = document.createElement("img"); im.className = "tT"; im.src = "/img/tether.png"; im.alt = "T"; frag.append(im); }
+      frag.append(part);
+    });
+    n.replaceWith(frag);
+  }
+}
+
+// ---- formatting
+const usd = (v, d) => v == null || !isFinite(v) ? "–" : "$" + v.toLocaleString("en-US", { maximumFractionDigits: d ?? (v >= 100 ? 0 : 2), minimumFractionDigits: d ?? (v >= 100 ? 0 : 2) });
+const big = (v) => { if (v == null || !isFinite(v)) return "–"; const a = Math.abs(v);
+  if (a >= 1e12) return "$" + (v / 1e12).toFixed(2) + "T"; if (a >= 1e9) return "$" + (v / 1e9).toFixed(2) + "B";
+  if (a >= 1e6) return "$" + (v / 1e6).toFixed(2) + "M"; if (a >= 1e3) return "$" + (v / 1e3).toFixed(1) + "k"; return usd(v); };
+const btcf = (v, d = 6) => v == null ? "–" : v.toFixed(d) + " BTC";
+const num = (v, d = 0) => v.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const pct = (v, d = 2) => v == null || !isFinite(v) ? "–" : (v >= 0 ? "+" : "") + v.toFixed(d) + "%";
+const chg = (v) => `<span class="${v >= 0 ? "up" : "down"}">${v == null || !isFinite(v) ? "–" : (v >= 0 ? "▲ " : "▼ ") + Math.abs(v).toFixed(2) + "%"}</span>`;
+const ago = (s) => s < 60 ? `${Math.round(s)} s` : s < 3600 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1)} h`;
+const day = (t) => new Date(t * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+
+// ---- supply model: coins issued through height h; heights between the split and now are interpolated
+function supplyAt(h) { let t = 0, sub = 50e8, from = 0;
+  while (from <= h && sub > 0) { const to = Math.min(h, from + 209999); t += (to - from + 1) * sub; from += 210000; sub = Math.floor(sub / 2); }
+  return t / 1e8; }
+function heightAt(chain, ts) {
+  const { height: H, time: T } = D.split, h = chain.height, tt = chain.tipTime;
+  if (ts >= tt) return h; if (ts <= T) return H;
+  return Math.round(H + (ts - T) / (tt - T) * (h - H));
+}
+const supplyAtTime = (chain, ts) => supplyAt(heightAt(chain, ts));
+
+// ---- candles at any timeframe
+const TFSEC = { "1m": 60, "5m": 300, "15m": 900, "1h": 3600, "4h": 14400, "1d": 86400, "1w": 604800 };
+const INTRADAY = ["1m", "5m", "15m"];
+const weekStart = (t) => { const d = Math.floor(t / 86400); return (d - ((d + 3) % 7)) * 86400; }; // Monday 00:00 UTC
+function agg(cs, bucket) {
+  const out = []; let cur = null;
+  for (const c of cs) {
+    const b = bucket(c.time);
+    if (!cur || cur.time !== b) { cur && out.push(cur); cur = { time: b, open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume || 0 }; }
+    else { cur.high = Math.max(cur.high, c.high); cur.low = Math.min(cur.low, c.low); cur.close = c.close; cur.volume += c.volume || 0; }
+  }
+  cur && out.push(cur); return out;
+}
+function derive(src, tf) { // src holds "1h" and "1d"; 4h and 1W are built from them
+  if (tf === "4h") return agg(src["1h"] || [], t => t - t % 14400);
+  if (tf === "1w") return agg(src["1d"] || [], weekStart);
+  return src[tf] || [];
+}
+async function candlesFor(tf) {
+  if (INTRADAY.includes(tf)) {
+    if (!INTRA[tf]) {
+      const j = await fetch(`/api/candles?tf=${tf}`).then(r => r.json());
+      if (j.error) throw new Error(j.error);
+      INTRA[tf] = { xbt: j.xbt, btc: j.btc };
+    }
+    return INTRA[tf];
+  }
+  return { xbt: derive(D.candles.xbt, tf), btc: derive(D.candles.btc, tf) };
+}
+const preFor = (tf) => !PRE || INTRADAY.includes(tf) ? [] : derive(PRE, tf);
+
+// XBT/BTC candles joined to ShaT/USD candles
+function join(c) {
+  const xc = c.xbt, bc = c.btc, bmap = new Map(bc.map(b => [b.time, b]));
+  let lastB = null, bi = 0; const out = [];
+  for (const x of xc) {
+    while (bi < bc.length && bc[bi].time <= x.time) { lastB = bc[bi]; bi++; }
+    const b = bmap.get(x.time) || lastB; if (!b) continue;
+    const xs = supplyAtTime(D.xbt.chain, x.time), bs = supplyAtTime(D.btc.chain, x.time);
+    out.push({ time: x.time, xbtBtc: x, btc: b,
+      xbtUsd: { open: x.open * b.open, high: x.high * b.close, low: x.low * b.close, close: x.close * b.close },
+      xvol: (x.volume || 0) * x.close * b.close, bvol: (b.volume || 0) * b.close,
+      xmc: x.close * b.close * xs, bmc: b.close * bs, ratio: x.close * xs / bs * 100 });
+  }
+  return out;
+}
+function closeAgo(cs, sec) { const t = Date.now() / 1000 - sec; let best = null; for (const c of cs) { if (c.time <= t) best = c; else break; } return best ? best.close : null; }
+
+// ---- render the page
+function render() {
+  const X = D.xbt, B = D.btc, now = D.at / 1000;
+  const xUsd = X.btc * B.usd;
+  const xs = X.chain.supply, bs = B.chain.supply;
+  const xmc = xUsd * xs, bmc = B.usd * bs;
+  const ratio = xmc / bmc * 100;
+  const flipBtc = bmc / xs / B.usd; // XBT price in BTC at which the two market caps are equal
+  const mult = flipBtc / X.btc;
+
+  const H = D.candles.xbt["1h"], BH = D.candles.btc["1h"];
+  const xb1h = closeAgo(H, 3600), xb7d = closeAgo(H, 7 * 86400);
+  const b1h = closeAgo(BH, 3600), b24 = B.open24h, b7d = closeAgo(BH, 7 * 86400);
+  const xb24 = X.btc / (1 + X.changePct24h / 100);
+  const bc = { h1: (B.usd / b1h - 1) * 100, d1: (B.usd / b24 - 1) * 100, d7: (B.usd / b7d - 1) * 100 };
+  const xc = { h1: (xUsd / (xb1h * b1h) - 1) * 100, d1: (xUsd / (xb24 * b24) - 1) * 100, d7: (xUsd / (xb7d * b7d) - 1) * 100 };
+
+  // pre-split reference points, shared by both coins
+  const pd = PRE ? PRE["1d"] : [], jan1 = pd.find(c => c.time === Date.UTC(new Date().getUTCFullYear(), 0, 1) / 1000);
+  const ath = pd.length ? pd.reduce((m, c) => c.high > m.high ? c : m) : null;
+  const atSplit = pd.length ? pd[pd.length - 1].close : null;
+  if (jan1) { xc.ytd = (xUsd / jan1.open - 1) * 100; bc.ytd = (B.usd / jan1.open - 1) * 100; }
+
+  const hist = join({ xbt: H, btc: BH });
+  const rAth = hist.reduce((m, p) => p.ratio > m.ratio ? p : m, hist[0] || { ratio, time: now });
+  const rs = hist.map(p => ({ time: p.time, close: p.ratio }));
+  const r24 = closeAgo(rs, 86400), r7 = closeAgo(rs, 7 * 86400), rFirst = join({ xbt: D.candles.xbt["1d"], btc: D.candles.btc["1d"] })[0];
+
+  // hero
+  $("headline").textContent = `Bitcoin (XBT) is worth ${ratio.toFixed(2)}% of ShaT Coin`;
+  $("subline").innerHTML = `To flip ShaT Coin, XBT has to rise <b>${num(mult, 1)}×</b>, to about <b>${flipBtc.toFixed(4)} BTC</b> (${usd(flipBtc * B.usd, 0)}). ` +
+    (r24 != null ? `Over the last 24 hours the gap ${ratio >= r24 ? "<span class=up>narrowed</span>" : "<span class=down>widened</span>"} (${r24.toFixed(2)}% → ${ratio.toFixed(2)}%).` : "");
+  $("fill").style.width = Math.min(100, ratio) + "%";
+  $("t-xmc").textContent = big(xmc); $("t-xmc-s").innerHTML = chg(xc.d1) + " 24h";
+  $("t-bmc").textContent = big(bmc); $("t-bmc-s").innerHTML = chg(bc.d1) + " 24h";
+  $("t-flip").textContent = usd(flipBtc * B.usd, 0); $("t-flip-s").textContent = `${flipBtc.toFixed(4)} BTC per XBT, ${num(mult, 1)}× from here`;
+  $("t-ath").textContent = rAth.ratio.toFixed(2) + "%"; $("t-ath-s").textContent = "on " + new Date(rAth.time * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "numeric" }) + ` (XBT ${(rAth.xbtBtc?.close ?? X.btc).toFixed(5)} BTC)`;
+
+  // volume: ShaT across all exchanges once CoinGecko has answered, else Coinbase
+  const xVol = X.quoteVolume24h * B.usd;
+  const bAll = VOL && VOL.shat.length && VOL.sources.shat.includes("all") ? VOL.shat[VOL.shat.length - 1].value : null;
+  const bVol = bAll ?? B.volume24h * B.usd;
+
+  // table
+  const xSpark = hist.filter(p => p.time >= now - 7 * 86400).map(p => p.xbtUsd.close);
+  const bSpark = BH.filter(c => c.time >= now - 7 * 86400).map(c => c.close);
+  const rows = [
+    { name: "Bitcoin", tk: "XBT", algo: "BLAKE2b", logo: "/img/xbt.png", price: xUsd, sub: btcf(X.btc), c: xc, mc: xmc, vol: xVol, volSub: num(X.volume24h) + " XBT · NeoxEX", sup: xs, spark: xSpark },
+    { name: "ShaT Coin", tk: "BTC", algo: "SHA-256d · powered by Tether" + TETHER, logo: "/img/shat.png", price: B.usd, sub: "1.000000 BTC", c: bc, mc: bmc, vol: bVol, volSub: bAll ? num(bVol / B.usd) + " BTC · all exchanges" : num(B.volume24h) + " BTC · Coinbase", sup: bs, spark: bSpark },
+  ].sort((a, b) => b.mc - a.mc);
+  $("rows").innerHTML = rows.map((r, i) => `<tr>
+    <td class="muted">${i + 1}</td>
+    <td><div class="coin"><img src="${r.logo}" alt=""><div><b>${r.name}</b><span class="tk">${r.tk}</span><span class="algo">${r.algo}</span><span class="m-only small">${big(r.mc)} · ${(r.mc / (xmc + bmc) * 100).toFixed(2)}%</span></div></div></td>
+    <td>${usd(r.price)}<div class="small">${r.sub}</div><div class="m-only">${chg(r.c.d1)}</div></td>
+    <td>${chg(r.c.h1)}</td><td>${chg(r.c.d1)}</td><td>${chg(r.c.d7)}</td><td>${chg(r.c.ytd)}</td>
+    <td>${big(r.mc)}<div class="small">${(r.mc / (xmc + bmc) * 100).toFixed(2)}% of combined</div></td>
+    <td>${big(r.vol)}<div class="small">${r.volSub}</div></td>
+    <td>${num(r.sup)} ${r.tk}</td>
+    <td>${spark(r.spark)}</td></tr>`).join("") +
+    `<tr><td class="diff"></td><td class="diff">Difference</td><td class="diff"><span class="m-only">${big(bmc - xmc)} gap</span><span class="full">XBT = ${(xUsd / B.usd * 100).toFixed(2)}% of ShaT</span></td>
+     <td class="diff">${pct(xc.h1 - bc.h1)}</td><td class="diff">${pct(xc.d1 - bc.d1)}</td><td class="diff">${pct(xc.d7 - bc.d7)}</td><td class="diff">${pct(xc.ytd - bc.ytd)}</td>
+     <td class="diff">${big(bmc - xmc)} gap</td><td class="diff">XBT = ${(xVol / bVol * 100).toFixed(3)}% of ShaT</td>
+     <td class="diff">${xs >= bs ? "+" : ""}${num(xs - bs)} XBT</td><td class="diff"></td></tr>`;
+
+  // market share donut and the big drop
+  donut([{ name: "Bitcoin (XBT)", v: xmc, color: "var(--xbt)" }, { name: "ShaT Coin (BTC)", v: bmc, color: "var(--btc)" }]);
+  const held = xUsd + B.usd;
+  $("facts").innerHTML = [
+    jan1 && fact("Bitcoin (XBT) this year", pct(xc.ytd, 1), `${usd(jan1.open, 0)} on Jan 1 → ${usd(xUsd, 0)} today`, xc.ytd),
+    ath && fact("XBT from its all-time high", pct((xUsd / ath.high - 1) * 100, 1), `${usd(ath.high, 0)} on ${day(ath.time)} → ${usd(xUsd, 0)}`, -1),
+    atSplit && fact("XBT since the chain split", pct((xUsd / atSplit - 1) * 100, 1), `${usd(atSplit, 0)} at block 961,631 → ${usd(xUsd, 0)}`, xUsd - atSplit),
+    atSplit && fact("One coin held through the split", usd(held, 0), `${usd(xUsd, 0)} XBT + ${usd(B.usd, 0)} ShaT, ${pct((held / atSplit - 1) * 100, 1)} vs ${usd(atSplit, 0)} at the split`, held - atSplit),
+  ].filter(Boolean).join("");
+
+  // head to head
+  const line = (k, a, b, d) => `<tr><td>${k}</td><td>${a}</td><td>${b}</td><td>${d}</td></tr>`;
+  $("cmp").innerHTML = [
+    line("Market cap", big(xmc), big(bmc), ratio.toFixed(2) + "%"),
+    line("Price", usd(xUsd), usd(B.usd), (X.btc * 100).toFixed(2) + "%"),
+    line("24h change", chg(xc.d1), chg(bc.d1), pct(xc.d1 - bc.d1)),
+    line("7d change", chg(xc.d7), chg(bc.d7), pct(xc.d7 - bc.d7)),
+    line("This year", chg(xc.ytd), chg(bc.ytd), pct(xc.ytd - bc.ytd)),
+    line("Volume (24h)", big(xVol), big(bVol), (xVol / bVol * 100).toFixed(3) + "%"),
+    line("Volume ÷ market cap", (xVol / xmc * 100).toFixed(2) + "%", (bVol / bmc * 100).toFixed(2) + "%", ""),
+    line("Proof of work", "BLAKE2b", "SHA-256d", ""),
+    line("Powered by", "Proof of work", "Tether" + TETHER, ""),
+    line("Block height", num(X.chain.height), num(B.chain.height), (X.chain.height >= B.chain.height ? "+" : "") + num(X.chain.height - B.chain.height)),
+    line("Blocks since split", num(X.chain.blocksSinceSplit), num(B.chain.blocksSinceSplit), ""),
+    line("Recent block time", X.chain.blockInterval ? ago(X.chain.blockInterval) : "–", B.chain.blockInterval ? ago(B.chain.blockInterval) : "–", "target 10 min"),
+    line("Supply", num(xs), num(bs), (xs >= bs ? "+" : "") + num(xs - bs)),
+  ].join("");
+
+  const rc = (k, from) => from == null ? "" : `<tr><td>${k}</td><td>${from.toFixed(2)}% → ${ratio.toFixed(2)}%</td><td>${chg((ratio / from - 1) * 100)}</td></tr>`;
+  $("ratiochg").innerHTML = rc("Last 24 hours", r24) + rc("Last 7 days", r7) + (rFirst ? rc("Since listing (" + new Date(rFirst.time * 1000).toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" }) + ")", rFirst.ratio) : "");
+
+  CUR = { xUsd, xmc, xc, xVol, xs, xSpark, xbtBtc: X.btc, xbtChg: X.changePct24h };
+  renderRates();
+  if (!$("page-top").hidden) renderTop();
+  whatIf();
+  decorate($("page-home"));
+}
+
+// four ways to price one coin in the other
+function renderRates() {
+  const p = CUR.xbtBtc, c = CUR.xbtChg, inv = (1 / (1 + c / 100) - 1) * 100;
+  const X = `<img src="/img/xbt.png" alt="">`, S = `<img src="/img/shat.png" alt="">`;
+  const card = (k, v, s, ch) => `<div class="rate"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s} · ${chg(ch)}</div></div>`;
+  $("rates").innerHTML = [
+    card(`${X} XBT : BTC`, p.toFixed(6) + " <small>BTC</small>", "for 1 XBT", c),
+    card(`${S} BTC : XBT`, num(1 / p, 2) + " <small>XBT</small>", "for 1 BTC", inv),
+    card(`${X} 1 XBT in sats`, num(p * 1e8) + " <small>sats</small>", "ShaT sats per XBT", c),
+    card(`${S} 1 BTC in XBT sats`, num(1e8 / p) + " <small>sats</small>", "XBT sats per BTC", inv),
+  ].join("");
+}
+
+// ---- top 100
+const fmtPrice = (v) => v == null ? "–" : v >= 1 ? "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "$" + Number(v.toPrecision(4)).toString();
+const thin = (a, n) => a.length <= n ? a : Array.from({ length: n }, (_, i) => a[Math.round(i * (a.length - 1) / (n - 1))]);
+async function loadTop() {
+  try { const j = await fetch("/api/top").then(r => r.json()); if (j.error) throw new Error(j.error); TOP = j; renderTop(); }
+  catch (e) { if (!TOP) $("rank-head").textContent = "Couldn't load the top 100: " + e.message; }
+}
+function topList() {
+  const list = TOP.coins.map(c => c.id === "bitcoin" ? { ...c, name: "ShaT Coin", image: "/img/shat.png", tether: true } : c);
+  if (CUR) list.push({ id: "xbt", symbol: "XBT", name: "Bitcoin", image: "/img/xbt.png", price: CUR.xUsd, marketCap: CUR.xmc, volume: CUR.xVol, supply: CUR.xs,
+    h1: CUR.xc.h1, d1: CUR.xc.d1, d7: CUR.xc.d7, spark: thin(CUR.xSpark, 56), me: true });
+  return list.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0)).map((c, i) => ({ ...c, rank: i + 1 }));
+}
+function renderTop() {
+  if (!TOP) return;
+  const list = topList(), me = list.find(c => c.me);
+  if (me) {
+    const above = list[me.rank - 2], below = list[me.rank];
+    $("rank-head").innerHTML = `Bitcoin (XBT) ranks <b>#${me.rank}</b> by market cap`;
+    $("rank-sub").innerHTML = (above ? `It needs <b>${pct((above.marketCap / me.marketCap - 1) * 100, 1)}</b> to pass ${above.name} (${above.symbol}, ${big(above.marketCap)}) for #${above.rank}. ` : "") +
+      (below ? `Next below: ${below.name} (${below.symbol}, ${big(below.marketCap)}).` : "");
+  }
+  const q = $("topq").value.trim().toLowerCase();
+  const rows = q ? list.filter(c => c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)) : list;
+  $("toprows").innerHTML = rows.map(c => `<tr class="${c.me ? "me" : ""}" id="${c.me ? "row-xbt" : ""}">
+    <td>${c.rank}</td>
+    <td><div class="coin"><img src="${c.image}" alt="" loading="lazy"><div><b>${c.name}</b><span class="tk">${c.symbol}</span>${c.tether ? `<span class="algo">powered by Tether${TETHER}</span>` : c.me ? `<span class="algo">BLAKE2b</span>` : ""}<span class="m-only small">${c.marketCap ? big(c.marketCap) : ""}</span></div></div></td>
+    <td>${fmtPrice(c.price)}<div class="m-only">${chg(c.d1)}</div></td><td>${chg(c.h1)}</td><td>${chg(c.d1)}</td><td>${chg(c.d7)}</td>
+    <td>${c.marketCap ? `<span class="full">$${num(c.marketCap)}</span><span class="short">${big(c.marketCap)}</span>` : "–"}</td><td>${c.volume ? "$" + num(c.volume) : "–"}</td>
+    <td>${c.supply ? num(c.supply) + " " + c.symbol : "–"}</td>
+    <td>${sparkFixed(c.spark || [], c.d7)}</td></tr>`).join("") || `<tr><td></td><td colspan="9" class="muted">No coins match "${q}"</td></tr>`;
+  decorate($("page-top"));
+}
+// sparkline coloured by the 7-day change, like CoinMarketCap
+function sparkFixed(vals, d7) {
+  if (vals.length < 2) return "";
+  const w = 140, h = 44, lo = Math.min(...vals), hi = Math.max(...vals), rng = hi - lo || 1;
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 2 - (v - lo) / rng * (h - 4)).toFixed(1)}`).join(" ");
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${(d7 ?? 0) >= 0 ? "var(--up)" : "var(--down)"}" stroke-width="1.5" points="${pts}"/></svg>`;
+}
+$("topq").addEventListener("input", renderTop);
+$("jump").addEventListener("click", () => {
+  $("topq").value = ""; renderTop();
+  const r = $("row-xbt"); if (!r) return;
+  r.scrollIntoView({ behavior: "smooth", block: "center" }); r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash");
+});
+
+// ---- pages
+// /top-embed (or ?embed=1) serves this same page with the chrome hidden, so an
+// embedded table is literally the same code as the one on the site.
+const QS = new URLSearchParams(location.search);
+const EMBED = QS.get("embed") === "1" || location.pathname.replace(/\/$/, "") === "/top-embed";
+if (EMBED) {
+  document.body.classList.add("embed");
+  const t = QS.get("theme");
+  if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+}
+function route() {
+  const top = EMBED || location.hash === "#top100";
+  $("page-home").hidden = top; $("page-top").hidden = !top;
+  for (const a of $("nav").children) a.classList.toggle("on", a.dataset.page === (top ? "top" : "home"));
+  if (top) { TOP ? renderTop() : loadTop(); }
+}
+addEventListener("hashchange", route);
+setInterval(() => { if (!$("page-top").hidden) loadTop(); }, 120000);
+
+const fact = (k, v, s, sign) => `<div class="fact"><div class="k">${k}</div><div class="v ${sign >= 0 ? "up" : "down"}">${v}</div><div class="s">${s}</div></div>`;
+
+function donut(parts) {
+  const total = parts.reduce((a, p) => a + p.v, 0), R = 90, C = 2 * Math.PI * R;
+  let off = 0, arcs = "";
+  for (const p of parts) {
+    const len = p.v / total * C;
+    arcs += `<circle cx="110" cy="110" r="${R}" fill="none" stroke="${p.color}" stroke-width="30" stroke-dasharray="${Math.max(len, 1.5)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)"><title>${p.name}: ${(p.v / total * 100).toFixed(2)}%</title></circle>`;
+    off += len;
+  }
+  $("donut").innerHTML = arcs;
+  $("donut-pct").textContent = (parts[0].v / total * 100).toFixed(2) + "%";
+  $("keys").innerHTML = parts.map(p => `<div><i style="background:${p.color}"></i>${p.name}<span>${(p.v / total * 100).toFixed(2)}% · ${big(p.v)}</span></div>`).join("");
+}
+
+function spark(vals) {
+  if (vals.length < 2) return "";
+  const w = 140, h = 40, lo = Math.min(...vals), hi = Math.max(...vals), rng = hi - lo || 1;
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 2 - (v - lo) / rng * (h - 4)).toFixed(1)}`).join(" ");
+  const col = vals[vals.length - 1] >= vals[0] ? "var(--up)" : "var(--down)";
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${col}" stroke-width="1.6" points="${pts}"/></svg>`;
+}
+
+function whatIf() {
+  if (!D) return;
+  const p = parseFloat($("whatif").value);
+  if (!(p > 0)) { $("whatif-out").textContent = ""; return; }
+  const B = D.btc, xs = D.xbt.chain.supply, bs = B.chain.supply;
+  const xmc = p * B.usd * xs, r = xmc / (B.usd * bs) * 100;
+  setTimeout(() => decorate($("whatif-out")));
+  $("whatif-out").innerHTML = `XBT would be <b>${usd(p * B.usd, 0)}</b>, a market cap of <b>${big(xmc)}</b>.<br>
+    That is <b>${r.toFixed(1)}%</b> of ShaT Coin, ${num(p / D.xbt.btc, 1)}× today's XBT price.` + (r >= 100 ? ` <span class="up"><b>Flipped.</b></span>` : "");
+}
+
+// ---- chart ---------------------------------------------------------------
+let chart, main = null, extra = [], drawSeq = 0;
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const PRICE_VIEWS = ["xbt", "xbth", "btc"];
+// which timeframes each view can show
+const ALL_TF = ["1m", "5m", "15m", "1h", "4h", "1d", "1w"];
+const ALLOWED = { ratio: ALL_TF, mcap: ALL_TF, vol: ALL_TF, xbt: ALL_TF, xbth: ["1h", "4h", "1d", "1w"], btc: ALL_TF };
+const UNITS = { xbt: [["usd", "USD"], ["btc", "in BTC"]], xbth: [["usd", "USD"], ["btc", "in BTC"]], vol: [["24h", "Rolling 24h"], ["candle", "Per candle"]] };
+
+function makeChart() {
+  const el = $("chart"); el.innerHTML = "";
+  chart = LightweightCharts.createChart(el, {
+    autoSize: true,
+    layout: { background: { color: "transparent" }, textColor: css("--muted"), fontFamily: "Inter, sans-serif" },
+    grid: { vertLines: { color: css("--line") }, horzLines: { color: css("--line") } },
+    rightPriceScale: { borderColor: css("--line") },
+    timeScale: { borderColor: css("--line"), timeVisible: true, minBarSpacing: 0.05, rightOffset: 12 },
+    crosshair: { mode: 0 },
+  });
+  chart.subscribeCrosshairMove(p => readout(p && p.time && main ? p.seriesData.get(main) : null));
+}
+const priceFmt = (v) => v < 0 ? "" : v >= 10000 ? "$" + (v / 1000).toFixed(1) + "k" : usd(v);
+const candleOpts = () => ({ upColor: css("--up"), downColor: css("--down"), borderVisible: false, wickUpColor: css("--up"), wickDownColor: css("--down") });
+
+function addMain(data, fmt, color) {
+  const o = { priceFormat: fmt };
+  const t = state.type;
+  if (t === "candle") main = chart.addCandlestickSeries({ ...candleOpts(), ...o });
+  else if (t === "bar") main = chart.addBarSeries({ upColor: css("--up"), downColor: css("--down"), ...o });
+  else if (t === "line") main = chart.addLineSeries({ color, lineWidth: 2, ...o });
+  else main = chart.addAreaSeries({ lineColor: color, topColor: color + "55", bottomColor: color + "05", lineWidth: 2, ...o });
+  main.setData(t === "candle" || t === "bar" ? data : data.map(c => c.close == null ? { time: c.time } : { time: c.time, value: c.close }));
+}
+function addIndicators(data, volData) {
+  const closes = data.filter(c => c.close != null);
+  for (const [k, n, col] of [["ma20", 20, "#3b82f6"], ["ma50", 50, "#a855f7"], ["ma200", 200, "#f97316"]]) {
+    if (!state.ind[k] || closes.length < n) continue;
+    const s = chart.addLineSeries({ color: col, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    const out = []; let sum = 0;
+    closes.forEach((c, i) => { sum += c.close; if (i >= n) sum -= closes[i - n].close; if (i >= n - 1) out.push({ time: c.time, value: sum / n }); });
+    s.setData(out); extra.push(s);
+  }
+  if (state.ind.vol && volData && volData.length) {
+    const s = chart.addHistogramSeries({ priceScaleId: "vol", priceFormat: { type: "custom", formatter: big }, lastValueVisible: false, priceLineVisible: false });
+    chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+    s.setData(volData); extra.push(s);
+  }
+}
+let lastBar = null;
+function readout(d) {
+  const el = $("readout");
+  d = d || lastBar;
+  if (!d || !main) { el.innerHTML = ""; return; }
+  const f = main.__fmt || ((v) => v.toFixed(2));
+  if (d.open != null) {
+    const ch = (d.close / d.open - 1) * 100;
+    el.innerHTML = `<span>O <b>${f(d.open)}</b></span><span>H <b>${f(d.high)}</b></span><span>L <b>${f(d.low)}</b></span><span>C <b>${f(d.close)}</b></span><span class="${ch >= 0 ? "up" : "down"}">${pct(ch)}</span>`;
+  } else if (d.value != null) el.innerHTML = `<b>${f(d.value)}</b>`;
+  else el.innerHTML = `<span>No market</span>`;
+}
+
+function syncControls() {
+  const v = state.view, allowed = ALLOWED[v];
+  if (!allowed.includes(state.tf)) state.tf = allowed.includes("1d") ? "1d" : allowed[0];
+  const rolling = v === "vol" && state.vunit === "24h";
+  for (const b of $("tf").children) { b.disabled = !allowed.includes(b.dataset.tf); b.classList.toggle("on", b.dataset.tf === state.tf); }
+  $("tf").hidden = rolling;
+  $("type").hidden = !PRICE_VIEWS.includes(v);
+  const u = UNITS[v]; $("unit").hidden = !u;
+  if (u) { const key = v === "vol" ? "vunit" : "xunit"; $("unit").innerHTML = u.map(([val, lab]) => `<button data-u="${val}" class="${state[key] === val ? "on" : ""}">${lab}</button>`).join(""); }
+  for (const b of $("type").children) b.classList.toggle("on", b.dataset.t === state.type);
+  const sk = rolling ? "vscale" : "scale"; // rolling volume keeps its own scale, log by default
+  for (const b of $("scale").children) b.classList.toggle("on", b.dataset.s === (state[sk] || "0"));
+  for (const b of $("ind").children) { b.classList.toggle("on", !!state.ind[b.dataset.i]); b.hidden = b.dataset.i === "vol" && !PRICE_VIEWS.includes(v); }
+  $("ind").hidden = v === "vol" || v === "mcap";
+  for (const b of $("view").children) b.classList.toggle("on", b.dataset.v === v);
+  for (const b of $("range").children) b.classList.toggle("on", b.dataset.r === state.range);
+  save("state", state);
+}
+
+async function drawChart(keepRange) {
+  if (!D) return;
+  const seq = ++drawSeq;
+  syncControls();
+  const kept = keepRange && chart ? chart.timeScale().getVisibleLogicalRange() : null;
+  const rolling = state.view === "vol" && state.vunit === "24h";
+  let c = null;
+  try {
+    if (INTRADAY.includes(state.tf) && !INTRA[state.tf] && !rolling) { $("loading").textContent = "Loading candles…"; $("loading").hidden = false; }
+    if (rolling) { if (!VOL) await loadVolume(); if (!VOL) throw new Error("volume data unavailable"); }
+    else c = await candlesFor(state.tf);
+  } catch (e) { $("loading").textContent = "Couldn't load: " + e.message; $("loading").hidden = false; return; }
+  $("loading").hidden = true;
+  if (seq !== drawSeq) return; // a newer draw started while this one waited
+  if (!chart) makeChart();
+  if (main) chart.removeSeries(main); main = null; lastBar = null;
+  extra.forEach(s => chart.removeSeries(s)); extra = [];
+  const mode = Number(rolling ? state.vscale || "1" : state.scale);
+  chart.applyOptions({ leftPriceScale: { visible: false, mode, scaleMargins: { top: 0.1, bottom: 0.1 } }, rightPriceScale: { mode, scaleMargins: { top: 0.1, bottom: 0.1 } } });
+  const xbt = css("--xbt"), btc = css("--btc");
+  let legend = "", fmt, data = [];
+
+  if (state.view === "ratio") {
+    const pts = join(c);
+    fmt = (v) => v.toFixed(3) + "%";
+    main = chart.addAreaSeries({ lineColor: xbt, topColor: xbt + "55", bottomColor: xbt + "05", lineWidth: 2, priceFormat: { type: "custom", minMove: 0.0001, formatter: fmt } });
+    data = pts.map(p => ({ time: p.time, value: p.ratio }));
+    main.setData(data);
+    addIndicators(pts.map(p => ({ time: p.time, close: p.ratio })), null);
+    legend = `<span><i style="background:${xbt}"></i>XBT market cap as a % of ShaT Coin's market cap (100% = flipped)</span>`;
+  } else if (state.view === "mcap") {
+    const pts = join(c); fmt = big;
+    const f = { type: "custom", formatter: big };
+    main = chart.addLineSeries({ color: xbt, lineWidth: 2, priceFormat: f, priceScaleId: "left" });
+    const s2 = chart.addLineSeries({ color: btc, lineWidth: 2, priceFormat: f, priceScaleId: "right" }); extra.push(s2);
+    chart.applyOptions({ leftPriceScale: { visible: true, borderColor: css("--line"), mode } });
+    data = pts.map(p => ({ time: p.time, value: p.xmc }));
+    main.setData(data);
+    s2.setData(pts.map(p => ({ time: p.time, value: p.bmc })));
+    legend = `<span><i style="background:${xbt}"></i>Bitcoin (XBT) market cap, left scale</span><span><i style="background:${btc}"></i>ShaT Coin (BTC) market cap, right scale</span>`;
+  } else if (state.view === "vol") {
+    fmt = big; const f = { type: "custom", formatter: big };
+    if (rolling) {
+      // one log scale for both: XBT trades a tiny fraction of ShaT's volume
+      main = chart.addLineSeries({ color: xbt, lineWidth: 2, priceFormat: f });
+      const s2 = chart.addLineSeries({ color: btc, lineWidth: 2, priceFormat: f }); extra.push(s2);
+      data = VOL.xbt; main.setData(VOL.xbt); s2.setData(VOL.shat);
+      const lx = VOL.xbt[VOL.xbt.length - 1], ls = VOL.shat[VOL.shat.length - 1];
+      legend = `<span><i style="background:${xbt}"></i>XBT 24h volume, NeoxEX (its only market): ${big(lx.value)}</span><span><i style="background:${btc}"></i>ShaT 24h volume, ${VOL.sources.shat}: ${big(ls.value)}</span><span>XBT = ${(lx.value / ls.value * 100).toFixed(4)}% of ShaT${mode === 1 ? " · log scale" : ""}</span>`;
+    } else {
+      const pts = join(c);
+      main = chart.addHistogramSeries({ color: xbt, priceFormat: f, priceScaleId: "left" });
+      const s2 = chart.addHistogramSeries({ color: btc + "aa", priceFormat: f, priceScaleId: "right" }); extra.push(s2);
+      chart.applyOptions({ leftPriceScale: { visible: true, borderColor: css("--line"), mode, scaleMargins: { top: 0.55, bottom: 0 } }, rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.5 } } });
+      data = pts.map(p => ({ time: p.time, value: p.xvol }));
+      main.setData(data);
+      s2.setData(pts.map(p => ({ time: p.time, value: p.bvol })));
+      const sx = pts.reduce((a, p) => a + p.xvol, 0), sb = pts.reduce((a, p) => a + p.bvol, 0);
+      legend = `<span><i style="background:${xbt}"></i>XBT volume per candle, NeoxEX (bottom, left scale)</span><span><i style="background:${btc}"></i>ShaT volume per candle, Coinbase only (top, right scale)</span><span>Loaded period: XBT ${big(sx)} vs ShaT ${big(sb)} on Coinbase</span>`;
+    }
+  } else if (state.view === "xbt" || state.view === "xbth") {
+    const inBtc = state.xunit === "btc";
+    fmt = inBtc ? (v) => v.toFixed(6) : priceFmt;
+    const pts = join(c), vol = [];
+    let splitAt = null, listedAt = pts.length ? pts[0].time : null;
+    if (state.view === "xbth") {
+      const pre = preFor(state.tf), step = TFSEC[state.tf];
+      for (const p of pre) data.push(inBtc ? { time: p.time, open: 1, high: 1, low: 1, close: 1 } : { time: p.time, open: p.open, high: p.high, low: p.low, close: p.close });
+      splitAt = pre.length ? pre[pre.length - 1].time : null;
+      if (splitAt && listedAt) for (let t = splitAt + step; t < listedAt; t += step) data.push({ time: t }); // no market: a visible gap
+    }
+    for (const p of pts) {
+      const k = inBtc ? p.xbtBtc : p.xbtUsd;
+      data.push({ time: p.time, open: k.open, high: k.high, low: k.low, close: k.close });
+      vol.push({ time: p.time, value: p.xvol, color: (p.xbtUsd.close >= p.xbtUsd.open ? css("--up") : css("--down")) + "66" });
+    }
+    addMain(data, { type: "custom", minMove: inBtc ? 0.000001 : 0.01, formatter: fmt }, xbt);
+    if (state.view === "xbth") {
+      const marks = [];
+      if (splitAt) marks.push({ time: splitAt, position: "aboveBar", color: css("--down"), shape: "arrowDown", text: "Split" });
+      if (listedAt) marks.push({ time: listedAt, position: "belowBar", color: xbt, shape: "arrowUp", text: "XBT listed" });
+      main.setMarkers(marks);
+    }
+    addIndicators(data, vol);
+    legend = state.view === "xbth"
+      ? `<span>Bitcoin (XBT) ${inBtc ? "in BTC" : "in USD"}: Bitcoin's price up to the split on Aug 8, 2026, no market until Sep 1, then NeoxEX. Volume bars are XBT's since listing.</span>`
+      : `<span>Bitcoin (XBT) ${inBtc ? "in BTC, NeoxEX BTCB2/BTC" : "in USD: NeoxEX BTCB2/BTC × Coinbase BTC"}, since listing on Sep 1, 2026</span>`;
+  } else {
+    fmt = priceFmt;
+    const pre = preFor(state.tf), last = pre.length ? pre[pre.length - 1].time : 0;
+    data = pre.map(p => ({ time: p.time, open: p.open, high: p.high, low: p.low, close: p.close }))
+      .concat(c.btc.filter(k => k.time > last).map(k => ({ time: k.time, open: k.open, high: k.high, low: k.low, close: k.close })));
+    const vol = c.btc.filter(k => k.time > last).map(k => ({ time: k.time, value: k.volume * k.close, color: (k.close >= k.open ? css("--up") : css("--down")) + "66" }));
+    addMain(data, { type: "custom", minMove: 0.01, formatter: fmt }, btc);
+    if (last) main.setMarkers([{ time: last, position: "aboveBar", color: css("--down"), shape: "arrowDown", text: "Split" }]);
+    addIndicators(data, vol);
+    legend = `<span>ShaT Coin (BTC) in USD, Coinbase. Volume bars are Coinbase since the split.</span>`;
+  }
+  main.__fmt = fmt;
+  const lastReal = [...data].reverse().find(d => d.close != null || d.value != null);
+  lastBar = lastReal || null;
+  const on = Object.entries(state.ind).filter(([k, v]) => v && k.startsWith("ma")).map(([k]) => k.replace("ma", "MA "));
+  if (on.length && !$("ind").hidden) legend += `<span>${on.join(", ")}</span>`;
+  $("legend").innerHTML = legend; decorate($("legend"));
+  readout(null);
+  if (kept) chart.timeScale().setVisibleLogicalRange(kept); else applyRange();
+}
+
+const RANGE_DAYS = { "1D": 1, "5D": 5, "1M": 30, "3M": 91, "6M": 182, "1Y": 365, "5Y": 1826 };
+function applyRange() {
+  if (!chart) return;
+  if (state.range === "All") { chart.timeScale().fitContent(); return; }
+  const to = Date.now() / 1000;
+  const from = state.range === "YTD" ? Date.UTC(new Date().getUTCFullYear(), 0, 1) / 1000 : to - RANGE_DAYS[state.range] * 86400;
+  try { chart.timeScale().setVisibleRange({ from, to }); } catch (e) { chart.timeScale().fitContent(); }
+}
+// a sensible candle size for each range, as TradingView does
+function tfForRange(r, view) {
+  const long = view === "xbth" || view === "btc";
+  const m = { "1D": "5m", "5D": "15m", "1M": "1h", "3M": long ? "1d" : "4h", "6M": long ? "1d" : "4h", "YTD": long ? "1d" : "4h",
+    "1Y": long ? "1d" : "4h", "5Y": long ? "1w" : "1d", "All": long ? "1w" : "1h" };
+  return ALLOWED[view].includes(m[r]) ? m[r] : state.tf;
+}
+
+function onSeg(id, fn) { $(id).addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && !b.disabled) fn(b); }); }
+onSeg("view", b => {
+  state.view = b.dataset.v;
+  if (state.view === "xbth" || state.view === "btc") { state.range = "All"; state.tf = "1w"; }
+  else if (state.range === "All" || !ALLOWED[state.view].includes(state.tf)) { state.range = "All"; state.tf = "1h"; }
+  drawChart();
+});
+onSeg("tf", b => { state.tf = b.dataset.tf; drawChart(); });
+onSeg("type", b => { state.type = b.dataset.t; drawChart(true); });
+onSeg("unit", b => { if (state.view === "vol") state.vunit = b.dataset.u; else state.xunit = b.dataset.u; drawChart(); });
+onSeg("scale", b => { state[state.view === "vol" && state.vunit === "24h" ? "vscale" : "scale"] = b.dataset.s; drawChart(true); });
+onSeg("ind", b => { state.ind[b.dataset.i] = !state.ind[b.dataset.i]; drawChart(true); });
+onSeg("range", b => {
+  state.range = b.dataset.r;
+  const tf = state.view === "vol" && state.vunit === "24h" ? state.tf : tfForRange(state.range, state.view);
+  if (tf !== state.tf) { state.tf = tf; drawChart(); } else { syncControls(); applyRange(); }
+});
+$("fs").addEventListener("click", () => {
+  const el = $("chartcard");
+  if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else { el.classList.toggle("pseudofs"); chart && chart.timeScale().fitContent(); } // iPhone Safari has no element full screen
+});
+$("whatif").addEventListener("input", whatIf);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (chart) { chart.remove(); chart = null; main = null; extra = []; } drawChart(); });
+
+// ---- video
+$("sound").addEventListener("click", () => { const v = $("vid"); v.muted = false; v.currentTime = 0; v.play(); });
+$("vid").addEventListener("volumechange", () => { $("sound").hidden = !$("vid").muted; });
+async function shareLink(text) {
+  const data = { title: "The Flippening", text, url: ORIGIN + "/" };
+  if (navigator.share) { try { await navigator.share(data); } catch (e) {} return; }
+  try { await navigator.clipboard.writeText(`${text} ${data.url}`); toast("Link copied"); } catch (e) {}
+}
+$("share-video").addEventListener("click", () => shareLink("Why is it called ShaT Coin? SHA-256 + Tether. Watch XBT vs ShaT live:"));
+
+// Share the file itself where the browser allows it, so it arrives as a video
+// rather than a link; fall back to the link, then to the clipboard.
+$("share-vid").addEventListener("click", async () => {
+  const url = ORIGIN + "/media/shatcoin.mp4";
+  try {
+    const f = new File([await (await fetch(url)).blob()], "the-flippening.mp4", { type: "video/mp4" });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) return navigator.share({ files: [f], title: "The Flippening" });
+  } catch (e) {}
+  if (navigator.share) { try { return await navigator.share({ title: "The Flippening", url }); } catch (e) { return; } }
+  try { await navigator.clipboard.writeText(url); toast("Video link copied"); } catch (e) {}
+});
+
+// ---- install, widget, embed
+let deferred = null;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+if (standalone) $("install-text").textContent = "You're using the installed app.";
+else if (isIOS) $("ios-steps").hidden = false;
+addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferred = e; $("install").hidden = false; });
+$("install").addEventListener("click", async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $("install").hidden = true; });
+const embed = `<iframe src="${ORIGIN}/widget?embed=1" width="360" height="190" style="border:0;border-radius:12px" title="The Flippening"></iframe>`;
+$("embed-code").textContent = embed;
+$("copy-embed").addEventListener("click", async () => { try { await navigator.clipboard.writeText(embed); toast("Embed code copied"); } catch (e) {} });
+$("copy-script").addEventListener("click", async () => {
+  try { const s = await fetch("/scriptable.js").then(r => r.text()); await navigator.clipboard.writeText(s); toast("Widget script copied. Paste it into a new Scriptable script."); }
+  catch (e) { location.href = "/scriptable.js"; }
+});
+function toast(msg) {
+  const t = document.createElement("div"); t.textContent = msg;
+  Object.assign(t.style, { position: "fixed", left: "50%", bottom: "24px", transform: "translateX(-50%)", background: "var(--ink)", color: "var(--bg)", padding: "10px 16px", borderRadius: "10px", font: "600 14px Inter, sans-serif", zIndex: 99, maxWidth: "90vw" });
+  document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+}
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+
+// ---- data loop
+let lastOk = 0;
+async function loadVolume() {
+  try { const j = await fetch("/api/volume").then(r => r.json()); if (!j.error) VOL = j; } catch (e) {}
+}
+async function load() {
+  try {
+    if (!PRE) PRE = await fetch("/data/prefork.json").then(r => r.json()).catch(() => null);
+    const j = await fetch("/api/data", { cache: "no-store" }).then(r => r.json());
+    if (j.error) throw new Error(j.error);
+    const first = !D; D = j; lastOk = Date.now();
+    for (const k in INTRA) delete INTRA[k];
+    render();
+    drawChart(!first);
+    if (first) loadVolume().then(() => D && render());
+  } catch (e) {
+    if (!D) $("headline").innerHTML = `<span class="err">Couldn't load prices: ${e.message}. Retrying…</span>`;
+  }
+  tick();
+}
+function tick() {
+  if (!lastOk) return;
+  const s = (Date.now() - lastOk) / 1000;
+  $("updated").textContent = `Live · updated ${ago(s)} ago`;
+  $("dot").classList.toggle("stale", s > 120);
+}
+decorate(); route(); load(); setInterval(load, 30000); setInterval(tick, 5000); setInterval(loadVolume, 600000);
+</script>
+</body>
+</html>

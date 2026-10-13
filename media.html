@@ -22,7 +22,24 @@ h2{font-size:16px;margin:0 0 4px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
 .asset{border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center;min-width:0}
 .asset img{width:104px;height:104px;display:block;margin:0 auto 10px}
-.wm-dark{background:#0d1117;border-radius:10px;padding:18px 14px}
+
+.ways{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px}
+.way{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;
+ align-items:center;gap:12px;min-width:0}
+.way.on-dark{background:#0d1117}.way.on-light{background:#f7f8fa}
+.wayhd{font-size:12.5px;font-weight:700;align-self:flex-start}
+.way.on-dark .wayhd{color:#e6edf3}.way.on-light .wayhd{color:#0d1421}
+.wayhd span{font-weight:400;opacity:.65}
+.way .wm{width:100%;max-width:200px;height:auto}
+.way .ic{width:62px;height:62px}
+.scrollx{overflow-x:auto;margin-top:12px}
+.dltab{width:100%;border-collapse:collapse;font-size:13px;min-width:540px}
+.dltab th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;padding:0 10px 7px 0}
+.dltab td{border-top:1px solid var(--line);padding:10px 10px 10px 0;vertical-align:top}
+.dltab a{display:inline-block;font-size:12px;font-weight:700;text-decoration:none;color:var(--ink);
+ background:var(--chip);padding:4px 8px;border-radius:6px;margin:0 4px 4px 0;white-space:nowrap}
+.dltab a:hover{background:var(--xbt);color:#1a1200}
+
 :root[data-theme="light"] .wm-dark, :root:not([data-theme="dark"]) .wm-dark{background:#0d1117}
 .asset .nm{font-weight:700;font-size:14px}
 .dl{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px}
@@ -54,78 +71,107 @@ footer a{color:inherit}
 </header>
 
 <section class="card">
-  <h2>Logos</h2>
-  <div class="muted">The ShaT Coin marks put the Tether logo where the <b>T</b> belongs — that is the joke, and
-    it is the point. SVG is drawn as real shapes so it stays sharp at any size; PNGs have a transparent
-    background. Free to use, no permission needed.</div>
+  <h2>The ShaT Coin logo</h2>
+  <div class="muted">The mark puts the Tether diamond where the <b>T</b> belongs — that is the joke, and it is
+    the point. Three colourways, two lockups, every format. SVG is drawn as real shapes, so it stays sharp at
+    any size and prints cleanly. Free to use, no permission needed.</div>
 
-  <div class="grid">
-    <div class="asset" style="grid-column:1/-1">
-      <div class="wm-dark"><img src="/brand/shat-wordmark.svg" alt="ShaT Coin wordmark" style="width:min(420px,100%);height:auto"></div>
-      <div class="nm" style="margin-top:12px">ShaT Coin · wordmark</div>
-      <div class="muted">The full lockup. Two versions: white "Coin" for dark backgrounds, near-black for light.</div>
-      <div class="dl">
-        <a href="/brand/shat-wordmark.svg" download>SVG (dark bg)</a>
-        <a href="/brand/shat-wordmark-dark.svg" download>SVG (light bg)</a>
-        <a href="/brand/shat-wordmark-1600.png" download>PNG 1600</a>
-        <a href="/brand/shat-wordmark-800.png" download>800</a>
-        <a href="/brand/shat-wordmark-400.png" download>400</a>
-      </div>
-      <div class="dl" style="margin-top:4px">
-        <a href="/brand/shat-wordmark-dark-1600.png" download>PNG 1600 (light bg)</a>
-        <a href="/brand/shat-wordmark-dark-800.png" download>800</a>
-        <a href="/brand/shat-wordmark-dark-400.png" download>400</a>
-      </div>
+  <div class="ways">
+    <div class="way on-dark">
+      <div class="wayhd">Full colour <span>on dark</span></div>
+      <img class="wm" src="/brand/shat-wordmark-color-on-dark.svg" alt="ShaT Coin wordmark, full colour">
+      <img class="ic" src="/brand/shat-icon-color.svg" alt="ShaT Coin icon, full colour">
     </div>
+    <div class="way on-light">
+      <div class="wayhd">Full colour <span>on light</span></div>
+      <img class="wm" src="/brand/shat-wordmark-color-on-light.svg" alt="ShaT Coin wordmark, full colour">
+      <img class="ic" src="/brand/shat-icon-color.svg" alt="ShaT Coin icon, full colour">
+    </div>
+    <div class="way on-dark">
+      <div class="wayhd">White <span>one colour, for dark</span></div>
+      <img class="wm" src="/brand/shat-wordmark-white.svg" alt="ShaT Coin wordmark, white">
+      <img class="ic" src="/brand/shat-icon-white.svg" alt="ShaT Coin icon, white">
+    </div>
+    <div class="way on-light">
+      <div class="wayhd">Black <span>one colour, for light</span></div>
+      <img class="wm" src="/brand/shat-wordmark-black.svg" alt="ShaT Coin wordmark, black">
+      <img class="ic" src="/brand/shat-icon-black.svg" alt="ShaT Coin icon, black">
+    </div>
+  </div>
 
-    <div class="asset">
-      <img src="/brand/shat-tether.svg" alt="ShaT Coin icon">
-      <div class="nm">ShaT Coin · icon</div><div class="muted">coin and diamond, for avatars and favicons</div>
-      <div class="dl">
-        <a href="/brand/shat-tether.svg" download>SVG</a>
-        <a href="/brand/shat-tether-512.png" download>512</a>
-        <a href="/brand/shat-tether-256.png" download>256</a>
-        <a href="/brand/shat-tether-128.png" download>128</a>
-        <a href="/brand/shat-tether-64.png" download>64</a>
-      </div>
-    </div>
-    <div class="asset">
-      <img src="/brand/shat.svg" alt="ShaT Coin plain">
-      <div class="nm">ShaT Coin · plain</div><div class="muted">no Tether, where the joke would not land</div>
-      <div class="dl">
-        <a href="/brand/shat.svg" download>SVG</a>
-        <a href="/brand/shat-1024.png" download>1024</a>
-        <a href="/brand/shat-512.png" download>512</a>
-        <a href="/brand/shat-256.png" download>256</a>
-        <a href="/brand/shat-128.png" download>128</a>
-        <a href="/brand/shat-64.png" download>64</a>
-      </div>
-    </div>
-    <div class="asset">
-      <img src="/brand/xbt.svg" alt="Bitcoin XBT">
-      <div class="nm">Bitcoin (XBT)</div><div class="muted">BLAKE2b / BIP-110 chain</div>
-      <div class="dl">
-        <a href="/brand/xbt.svg" download>SVG</a>
-        <a href="/brand/xbt-1024.png" download>1024</a>
-        <a href="/brand/xbt-512.png" download>512</a>
-        <a href="/brand/xbt-256.png" download>256</a>
-        <a href="/brand/xbt-128.png" download>128</a>
-        <a href="/brand/xbt-64.png" download>64</a>
-      </div>
-    </div>
+  <h2 style="margin-top:22px">Download</h2>
+  <div class="muted">PNG and WEBP have transparent backgrounds. The ICO is a multi-size favicon; the PDFs are
+    vector, for print.</div>
+  <div class="scrollx">
+    <table class="dltab">
+      <thead><tr><th>Asset</th><th>Vector</th><th>Raster</th><th>Other</th></tr></thead>
+      <tbody>
+        <tr><td><b>Wordmark</b><br><span class="muted">colour, on dark</span></td>
+          <td><a href="/brand/shat-wordmark-color-on-dark.svg" download>SVG</a></td>
+          <td><a href="/brand/shat-wordmark-color-on-dark-1600.png" download>PNG 1600</a>
+              <a href="/brand/shat-wordmark-color-on-dark-800.png" download>800</a>
+              <a href="/brand/shat-wordmark-color-on-dark-400.png" download>400</a>
+              <a href="/brand/shat-wordmark-color-on-dark-1600.webp" download>WEBP</a></td><td>—</td></tr>
+        <tr><td><b>Wordmark</b><br><span class="muted">colour, on light</span></td>
+          <td><a href="/brand/shat-wordmark-color-on-light.svg" download>SVG</a></td>
+          <td><a href="/brand/shat-wordmark-color-on-light-1600.png" download>PNG 1600</a>
+              <a href="/brand/shat-wordmark-color-on-light-800.png" download>800</a>
+              <a href="/brand/shat-wordmark-color-on-light-400.png" download>400</a>
+              <a href="/brand/shat-wordmark-color-on-light-1600.webp" download>WEBP</a></td>
+          <td><a href="/brand/shat-wordmark-color-on-light.pdf" download>PDF</a></td></tr>
+        <tr><td><b>Wordmark</b><br><span class="muted">white</span></td>
+          <td><a href="/brand/shat-wordmark-white.svg" download>SVG</a></td>
+          <td><a href="/brand/shat-wordmark-white-1600.png" download>PNG 1600</a>
+              <a href="/brand/shat-wordmark-white-800.png" download>800</a>
+              <a href="/brand/shat-wordmark-white-400.png" download>400</a>
+              <a href="/brand/shat-wordmark-white-1600.webp" download>WEBP</a></td><td>—</td></tr>
+        <tr><td><b>Wordmark</b><br><span class="muted">black</span></td>
+          <td><a href="/brand/shat-wordmark-black.svg" download>SVG</a></td>
+          <td><a href="/brand/shat-wordmark-black-1600.png" download>PNG 1600</a>
+              <a href="/brand/shat-wordmark-black-800.png" download>800</a>
+              <a href="/brand/shat-wordmark-black-400.png" download>400</a>
+              <a href="/brand/shat-wordmark-black-1600.webp" download>WEBP</a></td><td>—</td></tr>
+        <tr><td><b>Icon</b><br><span class="muted">colour</span></td>
+          <td><a href="/brand/shat-icon-color.svg" download>SVG</a></td>
+          <td><a href="/brand/shat-icon-color-1024.png" download>PNG 1024</a>
+              <a href="/brand/shat-icon-color-512.png" download>512</a>
+              <a href="/brand/shat-icon-color-256.png" download>256</a>
+              <a href="/brand/shat-icon-color-128.png" download>128</a>
+              <a href="/brand/shat-icon-color-64.png" download>64</a>
+              <a href="/brand/shat-icon-color-512.webp" download>WEBP</a></td>
+          <td><a href="/brand/shat-icon-color.ico" download>ICO</a>
+              <a href="/brand/shat-icon-color.pdf" download>PDF</a></td></tr>
+        <tr><td><b>Icon</b><br><span class="muted">white</span></td>
+          <td><a href="/brand/shat-icon-white.svg" download>SVG</a></td>
+          <td><a href="/brand/shat-icon-white-1024.png" download>PNG 1024</a>
+              <a href="/brand/shat-icon-white-512.png" download>512</a>
+              <a href="/brand/shat-icon-white-256.png" download>256</a>
+              <a href="/brand/shat-icon-white-128.png" download>128</a>
+              <a href="/brand/shat-icon-white-64.png" download>64</a>
+              <a href="/brand/shat-icon-white-512.webp" download>WEBP</a></td><td>—</td></tr>
+        <tr><td><b>Icon</b><br><span class="muted">black</span></td>
+          <td><a href="/brand/shat-icon-black.svg" download>SVG</a></td>
+          <td><a href="/brand/shat-icon-black-1024.png" download>PNG 1024</a>
+              <a href="/brand/shat-icon-black-512.png" download>512</a>
+              <a href="/brand/shat-icon-black-256.png" download>256</a>
+              <a href="/brand/shat-icon-black-128.png" download>128</a>
+              <a href="/brand/shat-icon-black-64.png" download>64</a>
+              <a href="/brand/shat-icon-black-512.webp" download>WEBP</a></td><td>—</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <h2 style="margin-top:20px">Colours</h2>
   <div class="swatch">
     <div class="sw"><i style="background:#F7931A"></i><b>#F7931A</b><span>ShaT orange</span></div>
     <div class="sw"><i style="background:#009393"></i><b>#009393</b><span>Tether teal</span></div>
-    <div class="sw"><i style="background:linear-gradient(#FFEC9A,#D4AF37)"></i><b>#D4AF37</b><span>XBT gold</span></div>
-    <div class="sw"><i style="background:#0d1117"></i><b>#0d1117</b><span>page, dark</span></div>
+    <div class="sw"><i style="background:#111820"></i><b>#111820</b><span>ink</span></div>
+    <div class="sw"><i style="background:#ffffff;border:1px solid var(--line)"></i><b>#FFFFFF</b><span>reverse</span></div>
   </div>
   <ul class="rules">
     <li>Write it <b>ShaT Coin</b> — capital S, capital T, capital C.</li>
     <li>The diamond stands in for the T. Do not set the T as a letter as well.</li>
-    <li>Recolouring or stretching is fine as long as it still reads.</li>
+    <li>Use the one-colour versions where the full colour would not read.</li>
     <li>The Tether diamond on its own belongs to Tether. It is here only as part of this mark.</li>
   </ul>
 </section>

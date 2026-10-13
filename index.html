@@ -87,6 +87,24 @@ header { flex-wrap: wrap; }
 .rate .k img { width: 16px; height: 16px; }
 .rate .v { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .rate .s { font-size: 13px; color: var(--muted); }
+.conv { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-top: 12px; }
+.convhead { display: flex; flex-direction: column; gap: 3px; margin-bottom: 12px; }
+.convhead b { font-size: 15px; }
+.convhead .muted { font-size: 13px; line-height: 1.55; }
+.convrow { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.cf { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.cl { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.cl img { width: 16px; height: 16px; }
+.cl small { opacity: .75; }
+.cf input { width: 100%; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  border-radius: 9px; padding: 11px 12px; font-size: 19px; font-weight: 700;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.cf input:focus { outline: 2px solid var(--xbt); outline-offset: -1px; }
+.cu { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.swap { flex: 0 0 auto; border: 1px solid var(--line); background: var(--chip); color: var(--ink);
+  border-radius: 9px; width: 40px; height: 44px; font-size: 17px; cursor: pointer; margin-bottom: 20px; }
+.swap:hover { background: var(--xbt); color: #1a1200; }
+@media (max-width: 560px) { .swap { width: 100%; height: 34px; margin: 0 0 4px; } }
 .rate .v small { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
 
 /* top 100 */
@@ -311,6 +329,29 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
       <div class="tile"><div class="k">Best ratio since listing</div><div class="v" id="t-ath">–</div><div class="s" id="t-ath-s">&nbsp;</div></div>
     </div>
     <div class="rates" id="rates"></div>
+
+    <div class="conv" id="conv">
+      <div class="convhead">
+        <b>Sats to shats</b>
+        <span class="muted">A <b>sat</b> is one hundred-millionth of a Bitcoin (XBT). A <b>shat</b> is one
+          hundred-millionth of a ShaT Coin. Same arithmetic, different coin — so they are not worth the same,
+          and the rate below is live.</span>
+      </div>
+      <div class="convrow">
+        <label class="cf">
+          <span class="cl"><img src="/img/xbt.png" alt=""> sats <small>Bitcoin · XBT</small></span>
+          <input id="c_sats" type="text" inputmode="decimal" value="100000" autocomplete="off">
+          <span class="cu" id="c_sats_usd">&nbsp;</span>
+        </label>
+        <button class="swap" id="c_swap" title="swap">⇄</button>
+        <label class="cf">
+          <span class="cl"><img src="/img/shat.png" alt=""> shats <small>ShaT Coin · BTC</small></span>
+          <input id="c_shats" type="text" inputmode="decimal" autocomplete="off">
+          <span class="cu" id="c_shats_usd">&nbsp;</span>
+        </label>
+      </div>
+      <div class="muted small" id="c_rate">&nbsp;</div>
+    </div>
   </section>
 
   <section class="card">
@@ -643,7 +684,7 @@ function render() {
   const rc = (k, from) => from == null ? "" : `<tr><td>${k}</td><td>${from.toFixed(2)}% → ${ratio.toFixed(2)}%</td><td>${chg((ratio / from - 1) * 100)}</td></tr>`;
   $("ratiochg").innerHTML = rc("Last 24 hours", r24) + rc("Last 7 days", r7) + (rFirst ? rc("Since listing (" + new Date(rFirst.time * 1000).toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" }) + ")", rFirst.ratio) : "");
 
-  CUR = { xUsd, xmc, xc, xVol, xs, xSpark, xbtBtc: X.btc, xbtChg: X.changePct24h };
+  CUR = { xUsd, bUsd: B.usd, xmc, xc, xVol, xs, xSpark, xbtBtc: X.btc, xbtChg: X.changePct24h };
   renderRates();
   if (!$("page-top").hidden) renderTop();
   whatIf();
@@ -655,13 +696,50 @@ function renderRates() {
   const p = CUR.xbtBtc, c = CUR.xbtChg, inv = (1 / (1 + c / 100) - 1) * 100;
   const X = `<img src="/img/xbt.png" alt="">`, S = `<img src="/img/shat.png" alt="">`;
   const card = (k, v, s, ch) => `<div class="rate"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s} · ${chg(ch)}</div></div>`;
+  renderConv(CONV_LAST);
   $("rates").innerHTML = [
     card(`${X} XBT : BTC`, p.toFixed(6) + " <small>BTC</small>", "for 1 XBT", c),
     card(`${S} BTC : XBT`, num(1 / p, 2) + " <small>XBT</small>", "for 1 BTC", inv),
-    card(`${X} 1 XBT in sats`, num(p * 1e8) + " <small>sats</small>", "ShaT sats per XBT", c),
-    card(`${S} 1 BTC in XBT sats`, num(1e8 / p) + " <small>sats</small>", "XBT sats per BTC", inv),
+    card(`${X} 1 XBT in shats`, num(p * 1e8) + " <small>shats</small>", "ShaT Coin base units per XBT", c),
+    card(`${S} 1 BTC in sats`, num(1e8 / p) + " <small>sats</small>", "XBT base units per ShaT Coin", inv),
   ].join("");
 }
+
+// ---- sats <-> shats
+// One sat is 1e-8 XBT; one shat is 1e-8 ShaT Coin. The chains share the unit
+// arithmetic and nothing else, so the conversion is just the XBT/BTC rate.
+let CONV_LAST = "sats";
+function convRate() {
+  if (!CUR || !CUR.xbtBtc) return null;
+  const p = CUR.xbtBtc;                       // 1 XBT in BTC
+  return { shatsPerSat: p, satsPerShat: 1 / p,
+           satUsd: (CUR.xUsd || 0) / 1e8, shatUsd: (CUR.bUsd || 0) / 1e8 };
+}
+const parseNum = (v) => { const n = Number(String(v).replace(/[^0-9.]/g, "")); return isFinite(n) ? n : 0; };
+const grp = (n) => n >= 1 ? n.toLocaleString("en-US", { maximumFractionDigits: n < 1000 ? 2 : 0 })
+                          : Number(n.toPrecision(4)).toString();
+const usdSmall = (v) => v >= 0.01 ? "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                  : "$" + Number(v.toPrecision(2)).toString();
+function renderConv(from) {
+  const r = convRate(); if (!r) return;
+  const a = $("c_sats"), b = $("c_shats");
+  if (!a || !b) return;
+  if (from === "shats") a.value = grp(parseNum(b.value) * r.satsPerShat);
+  else b.value = grp(parseNum(a.value) * r.shatsPerSat);
+  const sats = parseNum(a.value), shats = parseNum(b.value);
+  $("c_sats_usd").textContent = usdSmall(sats * r.satUsd);
+  $("c_shats_usd").textContent = usdSmall(shats * r.shatUsd);
+  $("c_rate").innerHTML = `1 shat = <b>${grp(r.satsPerShat)} sats</b> · 1 sat = <b>${Number(r.shatsPerSat.toPrecision(4))} shats</b>
+    · a shat is worth ${grp(r.satsPerShat)}× a sat right now`;
+}
+["c_sats", "c_shats"].forEach((id) => {
+  const el = $(id); if (!el) return;
+  el.addEventListener("input", () => { CONV_LAST = id === "c_sats" ? "sats" : "shats"; renderConv(CONV_LAST); });
+});
+if ($("c_swap")) $("c_swap").addEventListener("click", () => {
+  const a = $("c_sats"), b = $("c_shats"), v = a.value; a.value = b.value; b.value = v;
+  CONV_LAST = "sats"; renderConv("sats");
+});
 
 // ---- top 100
 const fmtPrice = (v) => v == null ? "–" : v >= 1 ? "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "$" + Number(v.toPrecision(4)).toString();
