@@ -180,6 +180,14 @@ def build_stickers():
             f = os.path.join(out, f"shat-sticker-wordmark-{name}{tag}.svg")
             open(f, "w").write(svg)
             made.append(["wordmark", name, inches, cut, f, w, h])
+    for name, inches in SLOGAN_SIZES:
+        for dark, dtag in ((True, "-dark"), (False, "-light")):
+            for cut in (False, True):
+                tag = "-cutline" if cut else ""
+                svg, phys = sticker_slogan(inches, cut, dark)
+                f = os.path.join(out, f"shat-sticker-slogan{dtag}-{name}{tag}.svg")
+                open(f, "w").write(svg)
+                made.append([f"slogan{dtag}", name, inches, cut, f, phys, phys])
     json.dump(made, open("/tmp/stickers.json", "w"))
     return made
 
@@ -187,6 +195,19 @@ def build_stickers():
 # The lockup is "Sha" + diamond + "Coin". For print the text must not depend on a
 # font being installed, so both words are traced to outlines once and reused.
 _TXT = json.load(open(os.path.join(HERE, "text-paths.json")))
+
+# The die line for the wordmark is a TRACED outline of the keyline, not a stroke.
+# A stroke puts a ring on every boundary it meets, so the enclosed counter of the
+# "a" got its own little magenta loop inside the letter. The traced version is
+# the outer boundary only - the counters close up once the keyline is fattened,
+# so there is nothing inside to outline.
+_CUT = json.load(open(os.path.join(HERE, "wordmark-cut.json")))
+
+def _cut_path(stroke="#FF00FF", sw=0.5):
+    s = (_CUT["W"] + 2*_CUT["pad"]) / _CUT["vb"][2]
+    return (f'<g id="CutContour" transform="translate({-_CUT["pad"]} {-_CUT["pad"]}) scale({s})">'
+            f'<g {_CUT["attrs"]} fill="none" stroke="{stroke}" '
+            f'stroke-width="{sw / (s * _CUT["iscale"])}">{_CUT["paths"]}</g></g>')
 
 def _word(key, x, y, h, fill, uid):
     """Place a traced word so its cap height is `h`, top-left at (x, y)."""
@@ -241,11 +262,50 @@ def sticker_wordmark(inches, cutline, label, ink="#111820"):
     phys = inches * vbw / (W + 2*B)
     bleed_layer, _, _ = _lockup(stroke="#fff", sw=(B+bu)*2)
     key_layer,   _, _ = _lockup(stroke="#fff", sw=B*2)
-    cut = ""
-    if cutline:
-        a, _, _ = _lockup(stroke="#FF00FF", sw=B*2)
-        b, _, _ = _lockup(stroke="#fff", sw=B*2-CW)
-        cut = f'<g id="CutContour">{a}{b}</g>'
+    cut = _cut_path("#FF00FF", CW) if cutline else ""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-pad} {vbw} {vbh}" '
             f'width="{phys:.4f}in" height="{phys*vbh/vbw:.4f}in">'
             f'{bleed_layer}{key_layer}{cut}{art_body}</svg>\n'), phys, phys*vbh/vbw
+
+# ---------------------------------------------------------------- slogan sticker
+# "BITCOIN / NOT / BTC" - the whole argument of the site in three words. Set on a
+# rounded plate rather than die cut to the letters: three stacked words have far
+# too many internal gaps for a blade to follow.
+_SLG = json.load(open(os.path.join(HERE, "slogan-paths.json")))
+GOLD, INK, MUTED = "#D4AF37", "#111820", "#8b95a5"
+
+def _slogan_word(key, cx, y, h, fill):
+    w = _SLG[key]
+    s = h / w["vb"][3]
+    wide = w["vb"][2] * s
+    return (f'<g transform="translate({cx - wide/2} {y}) scale({s})">'
+            f'<g {w["attrs"]} fill="{fill}">{w["paths"]}</g></g>'), wide
+
+def sticker_slogan(inches, cutline, dark=True):
+    W, H = 320.0, 320.0
+    r = 46.0
+    bg   = "#0d1117" if dark else "#f7f8fa"
+    ink  = "#FFFFFF" if dark else INK
+    mut  = "#8b95a5" if dark else "#616e85"
+    cx = W/2
+    # BITCOIN is the widest word; size it to the plate rather than to the others
+    b1, w1 = _slogan_word("BITCOIN", cx, 64, 54, GOLD)
+    b2, _  = _slogan_word("NOT",     cx, 140, 36, mut)
+    b3, w3 = _slogan_word("BTC",     cx, 190, 58, mut)
+    # the strike sits on the optical centre of the cap height, not the glyph box,
+    # which carries descender space the capitals never use
+    strike = (f'<rect x="{cx-w3/2-12}" y="{190+26}" width="{w3+24}" height="8.5" rx="4.25" fill="#e5484d"/>')
+    mark = diamond(cx-24, 258, 0.48, "#009393", "#fff", "slg")
+    bu = BLEED_IN * W / inches
+    pad = bu
+    side = W + 2*pad
+    phys = inches * side / W
+    cut = (f'<rect id="CutContour" x="{CUT_LW/2}" y="{CUT_LW/2}" width="{W-CUT_LW}" height="{H-CUT_LW}" '
+           f'rx="{r}" fill="none" stroke="#FF00FF" stroke-width="{CUT_LW}" stroke-dasharray="4 3"/>') if cutline else ''
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-pad} {side} {side}" '
+            f'width="{phys:.4f}in" height="{phys:.4f}in">'
+            f'<rect x="{-pad}" y="{-pad}" width="{side}" height="{side}" fill="{bg}"/>'
+            f'<rect x="0" y="0" width="{W}" height="{H}" rx="{r}" fill="{bg}"/>'
+            f'{b1}{b2}{b3}{strike}{mark}{cut}</svg>\n'), phys
+
+SLOGAN_SIZES = [("2in", 2.0), ("3in", 3.0), ("4in", 4.0), ("50mm", 50/25.4), ("75mm", 75/25.4)]
