@@ -181,13 +181,12 @@ def build_stickers():
             open(f, "w").write(svg)
             made.append(["wordmark", name, inches, cut, f, w, h])
     for name, inches in SLOGAN_SIZES:
-        for dark, dtag in ((True, "-dark"), (False, "-light")):
-            for cut in (False, True):
-                tag = "-cutline" if cut else ""
-                svg, phys = sticker_slogan(inches, cut, dark)
-                f = os.path.join(out, f"shat-sticker-slogan{dtag}-{name}{tag}.svg")
-                open(f, "w").write(svg)
-                made.append([f"slogan{dtag}", name, inches, cut, f, phys, phys])
+        for cut in (False, True):
+            tag = "-cutline" if cut else ""
+            svg, w, h = sticker_slogan(inches, cut)
+            f = os.path.join(out, f"shat-sticker-slogan-{name}{tag}.svg")
+            open(f, "w").write(svg)
+            made.append(["slogan", name, inches, cut, f, w, h])
     json.dump(made, open("/tmp/stickers.json", "w"))
     return made
 
@@ -281,31 +280,82 @@ def _slogan_word(key, cx, y, h, fill):
     return (f'<g transform="translate({cx - wide/2} {y}) scale({s})">'
             f'<g {w["attrs"]} fill="{fill}">{w["paths"]}</g></g>'), wide
 
-def sticker_slogan(inches, cutline, dark=True):
-    W, H = 320.0, 320.0
-    r = 46.0
-    bg   = "#0d1117" if dark else "#f7f8fa"
-    ink  = "#FFFFFF" if dark else INK
-    mut  = "#8b95a5" if dark else "#616e85"
-    cx = W/2
-    # BITCOIN is the widest word; size it to the plate rather than to the others
-    b1, w1 = _slogan_word("BITCOIN", cx, 64, 54, GOLD)
-    b2, _  = _slogan_word("NOT",     cx, 140, 36, mut)
-    b3, w3 = _slogan_word("BTC",     cx, 190, 58, mut)
-    # the strike sits on the optical centre of the cap height, not the glyph box,
-    # which carries descender space the capitals never use
-    strike = (f'<rect x="{cx-w3/2-12}" y="{190+26}" width="{w3+24}" height="8.5" rx="4.25" fill="#e5484d"/>')
-    mark = diamond(cx-24, 258, 0.48, "#009393", "#fff", "slg")
-    bu = BLEED_IN * W / inches
-    pad = bu
-    side = W + 2*pad
-    phys = inches * side / W
-    cut = (f'<rect id="CutContour" x="{CUT_LW/2}" y="{CUT_LW/2}" width="{W-CUT_LW}" height="{H-CUT_LW}" '
-           f'rx="{r}" fill="none" stroke="#FF00FF" stroke-width="{CUT_LW}" stroke-dasharray="4 3"/>') if cutline else ''
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-pad} {side} {side}" '
-            f'width="{phys:.4f}in" height="{phys:.4f}in">'
-            f'<rect x="{-pad}" y="{-pad}" width="{side}" height="{side}" fill="{bg}"/>'
-            f'<rect x="0" y="0" width="{W}" height="{H}" rx="{r}" fill="{bg}"/>'
-            f'{b1}{b2}{b3}{strike}{mark}{cut}</svg>\n'), phys
+def _slogan_lockup(ink, mut, stroke=None, sw=0.0):
+    """BITCOIN / NOT / B(diamond)C, centred. The T in BTC is the Tether diamond,
+    the same joke as the wordmark, so no strike-through is needed to make the
+    point. Returns the body plus its bounding size."""
+    W = 320.0
+    cx = W / 2
+    def word(key, y, h, fill):
+        w = _SLG[key]
+        sc = h / w["vb"][3]
+        wide = w["vb"][2] * sc
+        sa = (f' stroke="{stroke}" stroke-width="{sw / (sc * w["iscale"])}" '
+              f'stroke-linejoin="round" stroke-linecap="round"') if stroke and sw else ""
+        return (f'<g transform="translate({cx - wide/2} {y}) scale({sc})">'
+                f'<g {w["attrs"]} fill="{fill}"{sa}>{w["paths"]}</g></g>'), wide
+    def glyph(key, x, y, h, fill):
+        w = _SLG[key]
+        sc = h / w["vb"][3]
+        wide = w["vb"][2] * sc
+        sa = (f' stroke="{stroke}" stroke-width="{sw / (sc * w["iscale"])}" '
+              f'stroke-linejoin="round" stroke-linecap="round"') if stroke and sw else ""
+        return (f'<g transform="translate({x} {y}) scale({sc})">'
+                f'<g {w["attrs"]} fill="{fill}"{sa}>{w["paths"]}</g></g>'), wide
+    c1 = ink if stroke is None else stroke
+    c2 = mut if stroke is None else stroke
+    b1, _ = word("BITCOIN", 54, 52, GOLD if stroke is None else stroke)
+    b2, _ = word("NOT", 122, 34, c2)
+    # B + diamond + C, measured so the row sits centred
+    hB = 56.0
+    wB = _SLG["B"]["vb"][2] * (hB / _SLG["B"]["vb"][3])
+    wC = _SLG["C"]["vb"][2] * (hB / _SLG["C"]["vb"][3])
+    dsc = 0.74
+    wD = 100 * dsc
+    hD = DH * dsc
+    gap = 3.0
+    row = wB + gap + wD + gap + wC
+    x0 = cx - row / 2
+    y0 = 168.0
+    gB, _ = glyph("B", x0, y0, hB, c1)
+    gC, _ = glyph("C", x0 + wB + gap + wD + gap, y0, hB, c1)
+    dy = y0 + (hB - hD) / 2 + 2
+    if stroke is None:
+        dia = diamond(x0 + wB + gap, dy, dsc, "#009393", "#fff", "slg")
+    else:
+        dia = diamond_sil(x0 + wB + gap, dy, dsc, stroke, "slgs", stroke, sw)
+    return b1 + b2 + gB + dia + gC, W, 238.0
 
-SLOGAN_SIZES = [("2in", 2.0), ("3in", 3.0), ("4in", 4.0), ("50mm", 50/25.4), ("75mm", 75/25.4)]
+
+def sticker_slogan(inches, cutline, dark=False):
+    W = 320.0
+    # a keyline fat enough to pull three stacked lines into one cuttable blob
+    B, CW = 14.0, CUT_LW
+    ink = INK
+    mut = "#6b7a90"
+    art, LW_, LH_ = _slogan_lockup(ink, mut)
+    keyl, _, _ = _slogan_lockup(ink, mut, stroke="#fff", sw=B*2)
+    bu = BLEED_IN * (W + 2*B) / inches
+    pad = B + bu
+    side_w = W + 2*pad
+    side_h = 238.0 + 2*pad
+    phys_w = inches * side_w / (W + 2*B)
+    bleed, _, _ = _slogan_lockup(ink, mut, stroke="#fff", sw=(B+bu)*2)
+    cut = _slogan_cut("#FF00FF", CW) if cutline else ""
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-pad} {side_w} {side_h}" '
+            f'width="{phys_w:.4f}in" height="{phys_w*side_h/side_w:.4f}in">'
+            f'{bleed}{keyl}{cut}{art}</svg>\n'), phys_w, phys_w*side_h/side_w
+
+
+def _slogan_cut(stroke="#FF00FF", sw=0.5):
+    if not os.path.exists(os.path.join(HERE, "slogan-cut.json")):
+        return ""
+    c = json.load(open(os.path.join(HERE, "slogan-cut.json")))
+    s = (c["W"] + 2*c["pad"]) / c["vb"][2]
+    return (f'<g id="CutContour" transform="translate({-c["pad"]} {-c["pad"]}) scale({s})">'
+            f'<g {c["attrs"]} fill="none" stroke="{stroke}" '
+            f'stroke-width="{sw / (s * c["iscale"])}">{c["paths"]}</g></g>')
+
+
+SLOGAN_SIZES = [("1.5in", 1.5), ("2in", 2.0), ("3in", 3.0), ("4in", 4.0),
+                ("50mm", 50/25.4), ("75mm", 75/25.4), ("100mm", 100/25.4)]
