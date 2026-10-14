@@ -1,34 +1,33 @@
 ShaT Coin sticker artwork
 =========================
 
-Everything here is vector PDF at the finished size plus bleed. Give the printer
-the PDF; the PNGs are only for shops that will not take vector.
-
-FILES
-  shat-sticker-diecut-2in.pdf        die cut, follows the shape of the mark
-  shat-sticker-diecut-3in.pdf
-  shat-sticker-circle-2in.pdf        round sticker, mark centred on a disc
-  shat-sticker-circle-3in.pdf
-  *-cutline.pdf                      the same art with the cut path drawn on top
-                                     in magenta, dashed, named CutContour
-  *-300dpi.png                       300 dpi raster, transparent background
+SVG and PDF are both vector and both at the finished size with bleed. Send
+whichever your printer prefers — most take either, and many prefer SVG. The
+PNGs are 300 dpi, only for shops that will not accept vector.
 
 SIZES
-  "2in" and "3in" are the FINISHED size after cutting.
-  Every page is 0.25in larger than that: 0.125in of bleed on each side.
-    2in sticker -> 2.25 x 2.25 in page
-    3in sticker -> 3.25 x 3.25 in page
-  The white keyline border around the mark is part of the design, not the bleed.
+  Inches : 1, 1.5, 2, 2.5, 3, 4
+  Metric : 25 mm, 50 mm, 75 mm, 100 mm
+  The number in the filename is the FINISHED size after cutting.
+
+BLEED
+  Every file carries 0.125 in (3.18 mm) of bleed on each side, already included,
+  so the artboard is 0.25 in larger than the finished sticker. A 2in sticker is
+  a 2.25 x 2.25 in page. The bleed is the same physical distance at every size.
+  The white keyline around the mark is part of the design, not the bleed.
+
+SHAPES
+  diecut  the blade follows the outline of the mark
+  circle  the mark centred on a round sticker
+
+CUT LINE
+  Files ending -cutline draw the blade path in magenta, in a layer named
+  CutContour. Send those if the printer asks for a die line. Send the plain
+  ones if they generate it themselves.
 
 WHAT TO TELL THE PRINTER
-  Finished size: 2 in (or 3 in)
+  Finished size: as per the filename
   Bleed: 0.125 in all round, already included
-  Cut: die cut to the contour (use the CutContour layer in the -cutline file),
-       or round, depending on which file you send
-  Colours: orange #F7931A, teal #009393, white. RGB; ask them to convert to
-       CMYK if they need it, and expect the orange to lose a little punch.
-
-IF YOU WANT A DIFFERENT SIZE
-  The PDFs are vector, so a printer can scale them without losing quality, but
-  the bleed will scale too and stop being 0.125in. For a size that is not here,
-  ask for new files rather than scaling these.
+  Cut: die cut to contour (CutContour layer), or round
+  Colours: orange #F7931A, teal #009393, white. Supplied in RGB; ask them to
+  convert to CMYK if they need it and expect the orange to lose a little punch.
