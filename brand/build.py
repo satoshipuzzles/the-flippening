@@ -155,17 +155,97 @@ def sticker_circle(inches, cutline, label):
             f'<circle cx="0" cy="0" r="{s}" fill="#fff"/>'
             f'<g transform="translate(-44 -44)">{_art()}</g>{cut}</svg>\n'), phys
 
+# the wordmark is wide, so its sizes are widths rather than squares
+WORD_SIZES = [("2in", 2.0), ("3in", 3.0), ("4in", 4.0), ("5in", 5.0), ("6in", 6.0),
+              ("50mm", 50/25.4), ("75mm", 75/25.4), ("100mm", 100/25.4), ("150mm", 150/25.4)]
+
 def build_stickers():
     out = os.path.join(HERE, "print")
     os.makedirs(out, exist_ok=True)
+    for f in os.listdir(out):
+        if f.startswith("shat-sticker-") or f.startswith("_preview"):
+            os.remove(os.path.join(out, f))
     made = []
     for name, inches in SIZES:
-        for kind, fn in (("diecut", sticker_diecut), ("circle", sticker_circle)):
-            for cut in (False, True):
-                tag = "-cutline" if cut else ""
-                svg, phys = fn(inches, cut, f"{kind}{name}{int(cut)}")
-                f = os.path.join(out, f"shat-sticker-{kind}-{name}{tag}.svg")
-                open(f, "w").write(svg)
-                made.append([kind, name, inches, cut, f, phys])
+        for cut in (False, True):
+            tag = "-cutline" if cut else ""
+            svg, phys = sticker_diecut(inches, cut, f"ic{name}{int(cut)}")
+            f = os.path.join(out, f"shat-sticker-icon-{name}{tag}.svg")
+            open(f, "w").write(svg)
+            made.append(["icon", name, inches, cut, f, phys, phys])
+    for name, inches in WORD_SIZES:
+        for cut in (False, True):
+            tag = "-cutline" if cut else ""
+            svg, w, h = sticker_wordmark(inches, cut, f"wm{name}{int(cut)}")
+            f = os.path.join(out, f"shat-sticker-wordmark-{name}{tag}.svg")
+            open(f, "w").write(svg)
+            made.append(["wordmark", name, inches, cut, f, w, h])
     json.dump(made, open("/tmp/stickers.json", "w"))
     return made
+
+# ---------------------------------------------------------------- wordmark sticker
+# The lockup is "Sha" + diamond + "Coin". For print the text must not depend on a
+# font being installed, so both words are traced to outlines once and reused.
+_TXT = json.load(open(os.path.join(HERE, "text-paths.json")))
+
+def _word(key, x, y, h, fill, uid):
+    """Place a traced word so its cap height is `h`, top-left at (x, y)."""
+    t = _TXT[key]
+    s = h / t["vb"][3]
+    return (f'<g transform="translate({x} {y}) scale({s})">'
+            f'<g {t["attrs"]} fill="{fill}">{t["paths"]}</g></g>'), t["vb"][2] * s
+
+def _word_sil(key, x, y, h, fill, uid, stroke=None, sw=0.0):
+    t = _TXT[key]
+    s = h / t["vb"][3]
+    sa = (f' stroke="{stroke}" stroke-width="{sw / (s * t["iscale"])}" '
+          f'stroke-linejoin="round" stroke-linecap="round"') if stroke and sw else ""
+    return (f'<g transform="translate({x} {y}) scale({s})">'
+            f'<g {t["attrs"]} fill="{fill}"{sa}>{t["paths"]}</g></g>')
+
+# lockup geometry, in a 100-tall box
+LK_SHA_H, LK_COIN_H, LK_DIA = 56.0, 39.0, 0.74
+def _lockup(parts=False, ink="#111820", stroke=None, sw=0.0):
+    _, shaw = _word("sha", 0, 0, LK_SHA_H, "#000", "m")
+    _, coinw = _word("coin", 0, 0, LK_COIN_H, "#000", "m")
+    dw = 100 * LK_DIA
+    dh = DH * LK_DIA
+    gap = 6.0
+    x0 = 0.0
+    dx = x0 + shaw + gap
+    cx = dx + dw + gap
+    base = max(LK_SHA_H, dh)
+    sy = base - LK_SHA_H
+    dy = base - dh
+    cy = base - LK_COIN_H - 2
+    total_w = cx + coinw
+    if stroke:
+        body = (_word_sil("sha", x0, sy, LK_SHA_H, stroke, "s", stroke, sw)
+                + diamond_sil(dx, dy, LK_DIA, stroke, "ld"+str(int(sw*10)), stroke, sw)
+                + _word_sil("coin", cx, cy, LK_COIN_H, stroke, "c", stroke, sw))
+    else:
+        body = (_word("sha", x0, sy, LK_SHA_H, "#F7931A", "s")[0]
+                + diamond(dx, dy, LK_DIA, "#009393", "#fff", "lk")
+                + _word("coin", cx, cy, LK_COIN_H, ink, "c")[0])
+    return body, total_w, base
+
+def sticker_wordmark(inches, cutline, label, ink="#111820"):
+    art_body, W, H = _lockup(ink=ink)
+    # A thin keyline leaves hairline gaps between letters that a blade cannot
+    # follow. A fatter one merges the lockup into a single cuttable blob, which
+    # is how wordmark die cuts are normally drawn.
+    B, CW = 9.0, CUT_LW
+    bu = BLEED_IN * (W + 2*B) / inches
+    pad = B + bu
+    vbw, vbh = W + 2*pad, H + 2*pad
+    phys = inches * vbw / (W + 2*B)
+    bleed_layer, _, _ = _lockup(stroke="#fff", sw=(B+bu)*2)
+    key_layer,   _, _ = _lockup(stroke="#fff", sw=B*2)
+    cut = ""
+    if cutline:
+        a, _, _ = _lockup(stroke="#FF00FF", sw=B*2)
+        b, _, _ = _lockup(stroke="#fff", sw=B*2-CW)
+        cut = f'<g id="CutContour">{a}{b}</g>'
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-pad} {-pad} {vbw} {vbh}" '
+            f'width="{phys:.4f}in" height="{phys*vbh/vbw:.4f}in">'
+            f'{bleed_layer}{key_layer}{cut}{art_body}</svg>\n'), phys, phys*vbh/vbw
