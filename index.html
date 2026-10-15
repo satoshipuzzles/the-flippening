@@ -63,6 +63,12 @@ header { display: flex; align-items: center; justify-content: space-between; pad
 .status { color: var(--muted); font-size: 13px; text-align: right; }
 .status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--up); margin-right: 6px; vertical-align: 1px; }
 .status .dot.stale { background: var(--down); }
+.status .dot.part { background: #e0a21a; }
+/* A source being down is not the same as the page being broken, so it gets a
+   quiet line that says which number is affected and which ones are not. */
+.notice { margin: 0 0 14px; padding: 10px 13px; border-radius: 10px; font-size: 14px; line-height: 1.5;
+  background: rgba(224,162,26,.10); border: 1px solid rgba(224,162,26,.35); color: var(--ink); }
+.notice b { font-weight: 650; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
 h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -0.01em; }
 h3 { font-size: 15px; margin: 0 0 6px; }
@@ -282,6 +288,7 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.7; }
     <nav class="nav" id="nav"><a href="#" data-page="home" class="on">Flippening</a><a href="#top100" data-page="top">Top 100</a></nav>
     <div class="status"><span class="dot" id="dot"></span><span id="updated">Loading…</span></div>
   </header>
+  <div class="notice" id="notice" hidden></div>
 
   <div id="page-home">
   <section class="card">
@@ -1129,6 +1136,7 @@ async function load() {
     const first = !D; D = j; lastOk = Date.now();
     for (const k in INTRA) delete INTRA[k];
     render();
+    notice();
     drawChart(!first);
     if (first) loadVolume().then(() => D && render());
   } catch (e) {
@@ -1136,11 +1144,31 @@ async function load() {
   }
   tick();
 }
+// Which numbers on this page are not coming from their usual source. The chain
+// heights have a fallback chain (the chain's own explorer, then a node of ours,
+// then carried forward from the last height we saw), so the page keeps working
+// through an explorer outage - but it should never present a worked-out height
+// as though it were read off the chain.
+function notice() {
+  const n = $("notice"), bits = [];
+  const where = c => c.source === "estimate"
+    ? "worked out from the average block time"
+    : c.source === "node" ? "coming from our own node" : null;
+  for (const [name, c] of [["Bitcoin (XBT)", D.xbt.chain], ["ShaT Coin (BTC)", D.btc.chain]]) {
+    const w = where(c);
+    if (w) bits.push(`the <b>${name}</b> block height is ${w} because its block explorer is not answering`);
+  }
+  if (D.btc.volume24h == null) bits.push("Coinbase is not returning 24 hour high, low and volume");
+  if (!bits.length) { n.hidden = true; return; }
+  n.hidden = false;
+  n.innerHTML = `Right now ${bits.join(", and ")}. <b>Prices, market caps and the ratio are live.</b>`;
+}
 function tick() {
   if (!lastOk) return;
   const s = (Date.now() - lastOk) / 1000;
   $("updated").textContent = `Live · updated ${ago(s)} ago`;
   $("dot").classList.toggle("stale", s > 120);
+  $("dot").classList.toggle("part", s <= 120 && !!(D && D.degraded && D.degraded.length));
 }
 decorate(); route(); load(); setInterval(load, 30000); setInterval(tick, 5000); setInterval(loadVolume, 600000);
 </script>
